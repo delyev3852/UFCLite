@@ -12,7 +12,11 @@
   - FightGameMode.h/cpp — спавн бойцов по PlayerStart, Possess для 2 игроков
   - MainPlayerController.h/cpp — заготовка
 - **Сборка:** успешная (сборка прошла, UE5 открывается)
-- **Не сделано:** PlayerStart на уровне не поставлен (пользователь не смог найти в UE5), World Partition не отключён
+- **Сделано ещё:**
+  - Камера (SpringArm + CameraComponent) на персонаже
+  - Input Mappings (клавиатура WASD + геймпад) в DefaultInput.ini
+  - Арена (пол-куб) спавнится автоматически
+  - Бойцы спавнятся по центру если нет PlayerStart
 
 ## При старте новой сессии
 1. Прочитать этот файл + PLAN.md
