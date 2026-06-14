@@ -34,3 +34,7 @@ Thumbs.db
 Saved/
 *.blob
 
+
+# VS Upgrade
+Backup/
+UpgradeLog*
