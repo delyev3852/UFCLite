@@ -139,6 +139,17 @@ void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	EIC->BindAction(BlockAction, ETriggerEvent::Started, this, &AFighterCharacter::StartBlock);
 	EIC->BindAction(BlockAction, ETriggerEvent::Completed, this, &AFighterCharacter::StopBlock);
+
+	PlayerInputComponent->BindAxisKey(EKeys::Gamepad_LeftX, this, &AFighterCharacter::MoveRightLegacy);
+	PlayerInputComponent->BindAxisKey(EKeys::Gamepad_LeftY, this, &AFighterCharacter::MoveForwardLegacy);
+	PlayerInputComponent->BindActionKey(EKeys::Gamepad_FaceButton_Left, IE_Pressed, this, &AFighterCharacter::LeadJab);
+	PlayerInputComponent->BindActionKey(EKeys::Gamepad_FaceButton_Top, IE_Pressed, this, &AFighterCharacter::LeadCross);
+	PlayerInputComponent->BindActionKey(EKeys::Gamepad_FaceButton_Right, IE_Pressed, this, &AFighterCharacter::LeadHook);
+	PlayerInputComponent->BindActionKey(EKeys::Gamepad_FaceButton_Bottom, IE_Pressed, this, &AFighterCharacter::LeadUppercut);
+	PlayerInputComponent->BindActionKey(EKeys::Gamepad_RightTrigger, IE_Pressed, this, &AFighterCharacter::OnKickModifierPressed);
+	PlayerInputComponent->BindActionKey(EKeys::Gamepad_RightTrigger, IE_Released, this, &AFighterCharacter::OnKickModifierReleased);
+	PlayerInputComponent->BindActionKey(EKeys::Gamepad_RightShoulder, IE_Pressed, this, &AFighterCharacter::StartBlock);
+	PlayerInputComponent->BindActionKey(EKeys::Gamepad_RightShoulder, IE_Released, this, &AFighterCharacter::StopBlock);
 }
 
 void AFighterCharacter::MoveForward(const FInputActionValue& Value)
@@ -149,6 +160,16 @@ void AFighterCharacter::MoveForward(const FInputActionValue& Value)
 void AFighterCharacter::MoveRight(const FInputActionValue& Value)
 {
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value.Get<float>());
+}
+
+void AFighterCharacter::MoveForwardLegacy(float Value)
+{
+	AddMovementInput(FVector(0.0f, -1.0f, 0.0f), Value);
+}
+
+void AFighterCharacter::MoveRightLegacy(float Value)
+{
+	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
 }
 
 void AFighterCharacter::LeadJab()
@@ -206,6 +227,16 @@ void AFighterCharacter::RearKickBody()
 void AFighterCharacter::OnKickModifier(const FInputActionValue& Value)
 {
 	bKickModifierHeld = Value.Get<bool>();
+}
+
+void AFighterCharacter::OnKickModifierPressed()
+{
+	bKickModifierHeld = true;
+}
+
+void AFighterCharacter::OnKickModifierReleased()
+{
+	bKickModifierHeld = false;
 }
 
 void AFighterCharacter::OnBlockModifier(const FInputActionValue& Value)
