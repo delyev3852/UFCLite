@@ -52,7 +52,12 @@ void AFightGameMode::SpawnArenaCamera()
 	if (!GetWorld()) return;
 
 	FActorSpawnParameters SpawnParams;
-	ArenaCamera = GetWorld()->SpawnActor<ACameraActor>(FVector(0.0f, 800.0f, 300.0f), FRotator(-20.0f, 0.0f, 0.0f), SpawnParams);
+	FVector CamPos = FVector(0.0f, 500.0f, 200.0f);
+	ArenaCamera = GetWorld()->SpawnActor<ACameraActor>(CamPos, FRotator::ZeroRotator, SpawnParams);
+	if (ArenaCamera)
+	{
+		ArenaCamera->SetActorRotation((FVector::ZeroVector - CamPos).Rotation());
+	}
 }
 
 void AFightGameMode::SpawnFighters()
