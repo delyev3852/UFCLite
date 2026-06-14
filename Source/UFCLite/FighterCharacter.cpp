@@ -1,6 +1,8 @@
 #include "FighterCharacter.h"
 #include "HealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 AFighterCharacter::AFighterCharacter()
 {
@@ -8,8 +10,17 @@ AFighterCharacter::AFighterCharacter()
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
-	bIsBlocking = false;
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = 600.0f;
+	SpringArm->SetRelativeRotation(FRotator(-10.0f, 0.0f, 0.0f));
+	SpringArm->bEnableCameraLag = false;
+	SpringArm->bDoCollisionTest = false;
 
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+
+	bIsBlocking = false;
 	bReplicates = true;
 }
 
@@ -133,12 +144,6 @@ void AFighterCharacter::StopBlock()
 	}
 }
 
-void AFighterCharacter::OnDeath()
-{
-	GetCharacterMovement()->DisableMovement();
-	SetLifeSpan(3.0f);
-}
-
 void AFighterCharacter::LightAttack()
 {
 	JabPunch();
@@ -147,4 +152,10 @@ void AFighterCharacter::LightAttack()
 void AFighterCharacter::HeavyAttack()
 {
 	HookPunch();
+}
+
+void AFighterCharacter::OnDeath()
+{
+	GetCharacterMovement()->DisableMovement();
+	SetLifeSpan(3.0f);
 }

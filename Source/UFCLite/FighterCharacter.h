@@ -5,6 +5,8 @@
 #include "FighterCharacter.generated.h"
 
 class UHealthComponent;
+class USpringArmComponent;
+class UCameraComponent;
 
 UCLASS()
 class UFCLITE_API AFighterCharacter : public ACharacter
@@ -75,6 +77,12 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* HighKickMontage;
+
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* Camera;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsBlocking;
