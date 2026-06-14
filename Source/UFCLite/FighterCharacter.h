@@ -2,9 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "FighterCharacter.generated.h"
 
 class UHealthComponent;
+class UInputMappingContext;
+class UInputAction;
 
 UCLASS()
 class UFCLITE_API AFighterCharacter : public ACharacter
@@ -28,26 +31,57 @@ public:
 	UTexture2D* FighterPortrait;
 
 protected:
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-
+	void MoveForward(const FInputActionValue& Value);
+	void MoveRight(const FInputActionValue& Value);
 	void JabPunch();
 	void CrossPunch();
 	void HookPunch();
 	void UppercutPunch();
-
 	void LowKick();
 	void MidKick();
 	void HighKick();
-
 	void StartBlock();
 	void StopBlock();
-
 	void LightAttack();
 	void HeavyAttack();
 
 	UFUNCTION()
 	void OnDeath();
+
+	void SetupEnhancedInput();
+
+	UPROPERTY()
+	UInputMappingContext* InputMapping;
+
+	UPROPERTY()
+	UInputAction* MoveForwardAction;
+
+	UPROPERTY()
+	UInputAction* MoveRightAction;
+
+	UPROPERTY()
+	UInputAction* JabAction;
+
+	UPROPERTY()
+	UInputAction* CrossAction;
+
+	UPROPERTY()
+	UInputAction* HookAction;
+
+	UPROPERTY()
+	UInputAction* UppercutAction;
+
+	UPROPERTY()
+	UInputAction* LowKickAction;
+
+	UPROPERTY()
+	UInputAction* MidKickAction;
+
+	UPROPERTY()
+	UInputAction* HighKickAction;
+
+	UPROPERTY()
+	UInputAction* BlockAction;
 
 	UPROPERTY(EditAnywhere)
 	float StaminaCostLight = 5.0f;

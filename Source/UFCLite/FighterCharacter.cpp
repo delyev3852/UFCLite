@@ -4,6 +4,11 @@
 #include "Components/StaticMeshComponent.h"
 #include "Materials/MaterialInterface.h"
 #include "UObject/ConstructorHelpers.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
+#include "InputModifiers.h"
 
 AFighterCharacter::AFighterCharacter()
 {
@@ -35,6 +40,59 @@ AFighterCharacter::AFighterCharacter()
 			VisualMesh->SetMaterial(0, BodyMat.Object);
 		}
 	}
+
+	SetupEnhancedInput();
+}
+
+void AFighterCharacter::SetupEnhancedInput()
+{
+	InputMapping = NewObject<UInputMappingContext>(this);
+
+	auto NewAction = [this](EInputActionValueType Type)
+	{
+		UInputAction* Action = NewObject<UInputAction>(this);
+		Action->ValueType = Type;
+		return Action;
+	};
+
+	MoveForwardAction = NewAction(EInputActionValueType::Axis1D);
+	MoveRightAction = NewAction(EInputActionValueType::Axis1D);
+	JabAction = NewAction(EInputActionValueType::Boolean);
+	CrossAction = NewAction(EInputActionValueType::Boolean);
+	HookAction = NewAction(EInputActionValueType::Boolean);
+	UppercutAction = NewAction(EInputActionValueType::Boolean);
+	LowKickAction = NewAction(EInputActionValueType::Boolean);
+	MidKickAction = NewAction(EInputActionValueType::Boolean);
+	HighKickAction = NewAction(EInputActionValueType::Boolean);
+	BlockAction = NewAction(EInputActionValueType::Boolean);
+
+	auto Map = [this](UInputAction* Action, FKey Key) { return InputMapping->MapKey(Action, Key); };
+	auto Negate = [this]() { return NewObject<UInputModifierNegate>(); };
+
+	Map(MoveForwardAction, EKeys::W);
+	Map(MoveForwardAction, EKeys::S).Modifiers.Add(Negate());
+	Map(MoveForwardAction, EKeys::Gamepad_LeftY).Modifiers.Add(Negate());
+	Map(MoveRightAction, EKeys::A).Modifiers.Add(Negate());
+	Map(MoveRightAction, EKeys::D);
+	Map(MoveRightAction, EKeys::Gamepad_LeftX);
+
+	Map(JabAction, EKeys::X);
+	Map(JabAction, EKeys::Gamepad_FaceButton_Left);
+	Map(CrossAction, EKeys::Y);
+	Map(CrossAction, EKeys::Gamepad_FaceButton_Top);
+	Map(HookAction, EKeys::B);
+	Map(HookAction, EKeys::Gamepad_FaceButton_Right);
+	Map(UppercutAction, EKeys::A);
+	Map(UppercutAction, EKeys::Gamepad_FaceButton_Bottom);
+
+	Map(LowKickAction, EKeys::Q);
+	Map(LowKickAction, EKeys::Gamepad_LeftShoulder);
+	Map(MidKickAction, EKeys::E);
+	Map(MidKickAction, EKeys::Gamepad_RightShoulder);
+	Map(HighKickAction, EKeys::R);
+
+	Map(BlockAction, EKeys::LeftShift);
+	Map(BlockAction, EKeys::Gamepad_LeftTrigger);
 }
 
 void AFighterCharacter::BeginPlay()
@@ -44,6 +102,16 @@ void AFighterCharacter::BeginPlay()
 	if (HealthComponent)
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &AFighterCharacter::OnDeath);
+	}
+
+	APlayerController* PC = Cast<APlayerController>(Controller);
+	if (PC)
+	{
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+		if (Subsystem)
+		{
+			Subsystem->AddMappingContext(InputMapping, 0);
+		}
 	}
 }
 
@@ -61,40 +129,37 @@ void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AFighterCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AFighterCharacter::MoveRight);
+	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (!EIC) return;
 
-	PlayerInputComponent->BindAction("Jab", IE_Pressed, this, &AFighterCharacter::JabPunch);
-	PlayerInputComponent->BindAction("Cross", IE_Pressed, this, &AFighterCharacter::CrossPunch);
-	PlayerInputComponent->BindAction("Hook", IE_Pressed, this, &AFighterCharacter::HookPunch);
-	PlayerInputComponent->BindAction("Uppercut", IE_Pressed, this, &AFighterCharacter::UppercutPunch);
+	EIC->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AFighterCharacter::MoveForward);
+	EIC->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AFighterCharacter::MoveRight);
 
-	PlayerInputComponent->BindAction("LowKick", IE_Pressed, this, &AFighterCharacter::LowKick);
-	PlayerInputComponent->BindAction("MidKick", IE_Pressed, this, &AFighterCharacter::MidKick);
-	PlayerInputComponent->BindAction("HighKick", IE_Pressed, this, &AFighterCharacter::HighKick);
+	EIC->BindAction(JabAction, ETriggerEvent::Started, this, &AFighterCharacter::JabPunch);
+	EIC->BindAction(CrossAction, ETriggerEvent::Started, this, &AFighterCharacter::CrossPunch);
+	EIC->BindAction(HookAction, ETriggerEvent::Started, this, &AFighterCharacter::HookPunch);
+	EIC->BindAction(UppercutAction, ETriggerEvent::Started, this, &AFighterCharacter::UppercutPunch);
 
-	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &AFighterCharacter::StartBlock);
-	PlayerInputComponent->BindAction("Block", IE_Released, this, &AFighterCharacter::StopBlock);
+	EIC->BindAction(LowKickAction, ETriggerEvent::Started, this, &AFighterCharacter::LowKick);
+	EIC->BindAction(MidKickAction, ETriggerEvent::Started, this, &AFighterCharacter::MidKick);
+	EIC->BindAction(HighKickAction, ETriggerEvent::Started, this, &AFighterCharacter::HighKick);
+
+	EIC->BindAction(BlockAction, ETriggerEvent::Started, this, &AFighterCharacter::StartBlock);
+	EIC->BindAction(BlockAction, ETriggerEvent::Completed, this, &AFighterCharacter::StopBlock);
 }
 
-void AFighterCharacter::MoveForward(float Value)
+void AFighterCharacter::MoveForward(const FInputActionValue& Value)
 {
-	if (Controller && Value != 0.0f)
-	{
-		const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
-	}
+	if (!Controller) return;
+	const FRotator YawRot(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+	AddMovementInput(FRotationMatrix(YawRot).GetUnitAxis(EAxis::X), Value.Get<float>());
 }
 
-void AFighterCharacter::MoveRight(float Value)
+void AFighterCharacter::MoveRight(const FInputActionValue& Value)
 {
-	if (Controller && Value != 0.0f)
-	{
-		const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
-	}
+	if (!Controller) return;
+	const FRotator YawRot(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+	AddMovementInput(FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y), Value.Get<float>());
 }
 
 void AFighterCharacter::JabPunch()
