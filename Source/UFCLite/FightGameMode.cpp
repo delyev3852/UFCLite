@@ -2,6 +2,7 @@
 #include "FighterCharacter.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 AFightGameMode::AFightGameMode()
 {
@@ -19,26 +20,45 @@ void AFightGameMode::SpawnFighters()
 	TArray<AActor*> PlayerStarts;
 	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), PlayerStarts);
 
-	int32 SpawnIndex = 0;
-	for (AActor* Start : PlayerStarts)
+	if (PlayerStarts.Num() >= 2)
 	{
-		if (SpawnIndex >= 2) break;
-
-		APlayerStart* PlayerStart = Cast<APlayerStart>(Start);
-		if (!PlayerStart) continue;
-
-		FActorSpawnParameters SpawnParams;
-		AFighterCharacter* Fighter = GetWorld()->SpawnActor<AFighterCharacter>(FighterClass, PlayerStart->GetActorLocation(), PlayerStart->GetActorRotation(), SpawnParams);
-
-		if (Fighter)
+		for (int32 i = 0; i < 2; i++)
 		{
-			SetupFighterInput(Fighter, SpawnIndex);
+			APlayerStart* PS = Cast<APlayerStart>(PlayerStarts[i]);
+			if (!PS) continue;
 
-			if (SpawnIndex == 0) Fighter1 = Fighter;
-			else Fighter2 = Fighter;
+			FActorSpawnParameters SpawnParams;
+			AFighterCharacter* Fighter = GetWorld()->SpawnActor<AFighterCharacter>(FighterClass, PS->GetActorLocation(), PS->GetActorRotation(), SpawnParams);
+			if (Fighter)
+			{
+				SetupFighterInput(Fighter, i);
+				if (i == 0) Fighter1 = Fighter;
+				else Fighter2 = Fighter;
+			}
 		}
+	}
+	else
+	{
+		FVector SpawnPositions[] = {
+			FVector(-200.0f, 0.0f, 100.0f),
+			FVector(200.0f, 0.0f, 100.0f)
+		};
+		FRotator SpawnRotations[] = {
+			FRotator(0.0f, 0.0f, 0.0f),
+			FRotator(0.0f, -180.0f, 0.0f)
+		};
 
-		SpawnIndex++;
+		for (int32 i = 0; i < 2; i++)
+		{
+			FActorSpawnParameters SpawnParams;
+			AFighterCharacter* Fighter = GetWorld()->SpawnActor<AFighterCharacter>(FighterClass, SpawnPositions[i], SpawnRotations[i], SpawnParams);
+			if (Fighter)
+			{
+				SetupFighterInput(Fighter, i);
+				if (i == 0) Fighter1 = Fighter;
+				else Fighter2 = Fighter;
+			}
+		}
 	}
 }
 
