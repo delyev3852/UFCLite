@@ -64,7 +64,7 @@ void AFighterCharacter::SetupEnhancedInput()
 	KickModifierAction = NewA(EInputActionValueType::Boolean, TEXT("KickMod"));
 	BlockAction = NewA(EInputActionValueType::Boolean, TEXT("Block"));
 
-	auto Map = [this](UInputAction* A, FKey K) { InputMapping->MapKey(A, K); };
+	auto Map = [this](UInputAction* A, FKey K) -> FEnhancedActionKeyMapping& { return InputMapping->MapKey(A, K); };
 
 	Map(MoveForwardAction, EKeys::W);
 	Map(MoveForwardAction, EKeys::S).Modifiers.Add(NewObject<UInputModifierNegate>());
