@@ -16,14 +16,13 @@ void AFightHUD::DrawHUD()
 	AFighterCharacter* F2 = GM->GetFighter2();
 	if (!F1 || !F2) return;
 
-	float HealthWidth = Canvas->ClipX * 0.4f;
-	float HealthHeight = 20.0f;
-	float StaminaHeight = 12.0f;
-	float Y1 = 30.0f;
-	float Y2 = 60.0f;
+	float BarW = 300.0f;
+	float BarH = 20.0f;
+	float Pad = 30.0f;
+	float Top = 20.0f;
 
-	DrawFighterBars(F1, Canvas->ClipX * 0.05f, Y1, HealthWidth, StaminaHeight);
-	DrawFighterBars(F2, Canvas->ClipX * 0.55f, Y1, HealthWidth, StaminaHeight);
+	DrawFighterBars(F1, Pad, Top, BarW, BarH);
+	DrawFighterBars(F2, Canvas->SizeX - Pad - BarW, Top, BarW, BarH);
 }
 
 void AFightHUD::DrawFighterBars(AFighterCharacter* Fighter, float X, float Y, float Width, float Height)
@@ -31,16 +30,15 @@ void AFightHUD::DrawFighterBars(AFighterCharacter* Fighter, float X, float Y, fl
 	if (!Fighter || !Fighter->HealthComponent) return;
 
 	UHealthComponent* HC = Fighter->HealthComponent;
+	float HP = HC->GetHealth() / HC->MaxHealth;
+	float SP = HC->GetStamina() / HC->MaxStamina;
 
-	float HealthPct = HC->GetHealth() / HC->MaxHealth;
-	float StaminaPct = HC->GetStamina() / HC->MaxStamina;
+	DrawRect(FLinearColor::Black, X - 2, Y - 2, Width + 4, Height + 4);
+	DrawRect(FLinearColor(0.3f, 0.0f, 0.0f), X, Y, Width, Height);
+	DrawRect(FLinearColor::Red, X, Y, Width * HP, Height);
 
-	DrawRect(FLinearColor::Black, X - 1, Y - 1, Width + 2, Height + 2);
-	DrawRect(FLinearColor(0.2f, 0.0f, 0.0f), X, Y, Width, Height);
-	DrawRect(FLinearColor::Red, X, Y, Width * HealthPct, Height);
-
-	float StaminaY = Y + Height + 3;
-	DrawRect(FLinearColor::Black, X - 1, StaminaY - 1, Width + 2, 10 + 2);
-	DrawRect(FLinearColor(0.0f, 0.0f, 0.2f), X, StaminaY, Width, 10);
-	DrawRect(FLinearColor::Blue, X, StaminaY, Width * StaminaPct, 10);
+	float SY = Y + Height + 4;
+	DrawRect(FLinearColor::Black, X - 2, SY - 2, Width + 4, 12 + 4);
+	DrawRect(FLinearColor(0.0f, 0.0f, 0.2f), X, SY, Width, 12);
+	DrawRect(FLinearColor::Blue, X, SY, Width * SP, 12);
 }

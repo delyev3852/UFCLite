@@ -1,8 +1,6 @@
 #include "FighterCharacter.h"
 #include "HealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -11,16 +9,6 @@ AFighterCharacter::AFighterCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->TargetArmLength = 600.0f;
-	SpringArm->SetRelativeRotation(FRotator(-10.0f, 0.0f, 0.0f));
-	SpringArm->bEnableCameraLag = false;
-	SpringArm->bDoCollisionTest = false;
-
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
 	bIsBlocking = false;
 	bReplicates = true;

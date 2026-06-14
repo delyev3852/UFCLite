@@ -6,6 +6,7 @@
 #include "FightGameMode.generated.h"
 
 class AFighterCharacter;
+class ACameraActor;
 
 UCLASS()
 class UFCLITE_API AFightGameMode : public AGameModeBase
@@ -31,6 +32,7 @@ public:
 
 protected:
 	void SpawnArenaFloor();
+	void SpawnArenaCamera();
 	void SpawnFighters();
 	void SetupFighterInput(AFighterCharacter* Fighter, int32 PlayerIndex);
 
@@ -42,4 +44,7 @@ protected:
 
 	UPROPERTY()
 	AFighterCharacter* Fighter2;
+
+	UPROPERTY()
+	ACameraActor* ArenaCamera;
 };

@@ -4,6 +4,7 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "Engine/CameraActor.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/StaticMeshActor.h"
 #include "UObject/ConstructorHelpers.h"
@@ -28,6 +29,7 @@ void AFightGameMode::BeginPlay()
 	UGameplayStatics::CreatePlayer(this, 1, true);
 
 	SpawnArenaFloor();
+	SpawnArenaCamera();
 	SpawnFighters();
 }
 
@@ -45,6 +47,14 @@ void AFightGameMode::SpawnArenaFloor()
 		Floor->SetActorScale3D(FVector(500.0f, 50.0f, 0.5f));
 		Floor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
+}
+
+void AFightGameMode::SpawnArenaCamera()
+{
+	if (!GetWorld()) return;
+
+	FActorSpawnParameters SpawnParams;
+	ArenaCamera = GetWorld()->SpawnActor<ACameraActor>(FVector(0.0f, 800.0f, 300.0f), FRotator(-20.0f, 0.0f, 0.0f), SpawnParams);
 }
 
 void AFightGameMode::SpawnFighters()
@@ -84,11 +94,17 @@ void AFightGameMode::SpawnFighters()
 			SetupFighterInput(Fighter, i);
 			if (i == 0) Fighter1 = Fighter;
 			else Fighter2 = Fighter;
+		}
+	}
 
+	if (ArenaCamera)
+	{
+		for (int32 i = 0; i < 2; i++)
+		{
 			APlayerController* PC = UGameplayStatics::GetPlayerController(this, i);
 			if (PC)
 			{
-				PC->SetControlRotation(SpawnRot[i]);
+				PC->SetViewTarget(ArenaCamera);
 			}
 		}
 	}
