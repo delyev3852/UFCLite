@@ -21,10 +21,6 @@
 		{
 			"Name": "EnhancedInput",
 			"Enabled": true
-		},
-		{
-			"Name": "Windows.GamingInput",
-			"Enabled": true
 		}
 	]
 }
