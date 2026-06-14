@@ -40,6 +40,7 @@ AFighterCharacter::AFighterCharacter()
 		VisualMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		VisualMesh->SetIsReplicated(true);
 	}
+}
 
 void AFighterCharacter::BeginPlay()
 {
