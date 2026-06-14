@@ -143,12 +143,12 @@ void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFighterCharacter::MoveForward(const FInputActionValue& Value)
 {
-	AddMovementInput(GetActorForwardVector(), Value.Get<float>());
+	AddMovementInput(FVector(0.0f, 1.0f, 0.0f), Value.Get<float>());
 }
 
 void AFighterCharacter::MoveRight(const FInputActionValue& Value)
 {
-	AddMovementInput(GetActorRightVector(), Value.Get<float>());
+	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value.Get<float>());
 }
 
 void AFighterCharacter::LeadJab()
