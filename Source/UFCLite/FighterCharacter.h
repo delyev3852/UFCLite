@@ -48,8 +48,6 @@ protected:
 	void StartBlock();
 	void StopBlock();
 	void OnKickModifier(const FInputActionValue& Value);
-	void OnKickModifierPressed();
-	void OnKickModifierReleased();
 	void OnBlockModifier(const FInputActionValue& Value);
 
 	void LightAttack();
