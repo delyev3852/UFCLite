@@ -56,6 +56,8 @@ protected:
 	UFUNCTION()
 	void OnDeath();
 
+	void HitReact();
+
 	void SetupEnhancedInput();
 
 	UPROPERTY()
@@ -117,6 +119,15 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsBlocking;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDead = false;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* HitReactMontage;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* DeathMontage;
 
 	float LastDebugTime = 0.0f;
 };

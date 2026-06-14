@@ -1,8 +1,7 @@
 #include "FighterCharacter.h"
+#include "FighterAnimInstance.h"
 #include "HealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Components/StaticMeshComponent.h"
-#include "Materials/MaterialInterface.h"
 #include "UObject/ConstructorHelpers.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -23,24 +22,13 @@ AFighterCharacter::AFighterCharacter()
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
-	UStaticMeshComponent* VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualBody"));
-	VisualMesh->SetupAttachment(RootComponent);
-	VisualMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -50.0f));
-	VisualMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 2.0f));
-
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> BodyMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
-	if (BodyMesh.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MannequinMesh(TEXT("/Script/Engine.SkeletalMesh'/Engine/EngineMeshes/SkeletalMannequin.SkeletalMannequin'"));
+	if (MannequinMesh.Succeeded())
 	{
-		VisualMesh->SetStaticMesh(BodyMesh.Object);
-		VisualMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		VisualMesh->SetIsReplicated(true);
-
-		static ConstructorHelpers::FObjectFinder<UMaterialInterface> BodyMat(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
-		if (BodyMat.Succeeded())
-		{
-			VisualMesh->SetMaterial(0, BodyMat.Object);
-		}
+		GetMesh()->SetSkeletalMesh(MannequinMesh.Object);
 	}
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->AnimClass = UFighterAnimInstance::StaticClass();
 
 	bKickModifierHeld = false;
 	bBlockHeld = false;
@@ -298,8 +286,21 @@ void AFighterCharacter::HeavyAttack()
 	LeadHook();
 }
 
+void AFighterCharacter::HitReact()
+{
+	if (HitReactMontage)
+	{
+		PlayAnimMontage(HitReactMontage);
+	}
+}
+
 void AFighterCharacter::OnDeath()
 {
+	bIsDead = true;
 	GetCharacterMovement()->DisableMovement();
+	if (DeathMontage)
+	{
+		PlayAnimMontage(DeathMontage);
+	}
 	SetLifeSpan(3.0f);
 }
