@@ -30,6 +30,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UTexture2D* FighterPortrait;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsBlocking;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDead = false;
+
 protected:
 	void MoveForward(const FInputActionValue& Value);
 	void MoveRight(const FInputActionValue& Value);
@@ -116,12 +122,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* HighKickMontage;
-
-	UPROPERTY(BlueprintReadOnly)
-	bool bIsBlocking;
-
-	UPROPERTY(BlueprintReadOnly)
-	bool bIsDead = false;
 
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* HitReactMontage;
