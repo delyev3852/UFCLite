@@ -6,7 +6,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Framework/Application/SlateApplication.h"
+
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "InputModifiers.h"
@@ -129,7 +129,7 @@ void AFighterCharacter::Tick(float DeltaTime)
 				Msg += FString::SanitizeFloat(PC->PlayerInput->GetKeyValue(EKeys::Gamepad_LeftY));
 			}
 		}
-		Msg += FString::Printf(TEXT(" |Slate:%d"), FSlateApplication::Get().IsGamepadAttached() ? 1 : 0);
+
 		if (Msg.Len() > 12)
 		{
 			GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, Msg);
