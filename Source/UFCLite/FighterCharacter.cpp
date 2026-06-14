@@ -41,31 +41,37 @@ AFighterCharacter::AFighterCharacter()
 		}
 	}
 
+	InputMapping = CreateDefaultSubobject<UInputMappingContext>(TEXT("InputMapping"));
+	MoveForwardAction = CreateDefaultSubobject<UInputAction>(TEXT("MoveForwardAction"));
+	MoveRightAction = CreateDefaultSubobject<UInputAction>(TEXT("MoveRightAction"));
+	FaceLeftAction = CreateDefaultSubobject<UInputAction>(TEXT("FaceLeftAction"));
+	FaceTopAction = CreateDefaultSubobject<UInputAction>(TEXT("FaceTopAction"));
+	FaceRightAction = CreateDefaultSubobject<UInputAction>(TEXT("FaceRightAction"));
+	FaceBottomAction = CreateDefaultSubobject<UInputAction>(TEXT("FaceBottomAction"));
+	KickModifierAction = CreateDefaultSubobject<UInputAction>(TEXT("KickModifierAction"));
+	BlockAction = CreateDefaultSubobject<UInputAction>(TEXT("BlockAction"));
+
+	MoveForwardAction->ValueType = EInputActionValueType::Axis1D;
+	MoveRightAction->ValueType = EInputActionValueType::Axis1D;
+	FaceLeftAction->ValueType = EInputActionValueType::Boolean;
+	FaceTopAction->ValueType = EInputActionValueType::Boolean;
+	FaceRightAction->ValueType = EInputActionValueType::Boolean;
+	FaceBottomAction->ValueType = EInputActionValueType::Boolean;
+	KickModifierAction->ValueType = EInputActionValueType::Boolean;
+	BlockAction->ValueType = EInputActionValueType::Boolean;
+
+	bKickModifierHeld = false;
+	bBlockHeld = false;
+
 	SetupEnhancedInput();
+}
+	}
+
 }
 
 void AFighterCharacter::SetupEnhancedInput()
 {
 	InputMapping = NewObject<UInputMappingContext>(this);
-
-	auto NewAction = [this](EInputActionValueType Type)
-	{
-		UInputAction* Action = NewObject<UInputAction>(this);
-		Action->ValueType = Type;
-		return Action;
-	};
-
-	MoveForwardAction = NewAction(EInputActionValueType::Axis1D);
-	MoveRightAction = NewAction(EInputActionValueType::Axis1D);
-	FaceLeftAction = NewAction(EInputActionValueType::Boolean);
-	FaceTopAction = NewAction(EInputActionValueType::Boolean);
-	FaceRightAction = NewAction(EInputActionValueType::Boolean);
-	FaceBottomAction = NewAction(EInputActionValueType::Boolean);
-	KickModifierAction = NewAction(EInputActionValueType::Boolean);
-	BlockAction = NewAction(EInputActionValueType::Boolean);
-
-	bKickModifierHeld = false;
-	bBlockHeld = false;
 
 	auto Map = [this](UInputAction* Action, FKey Key) { return InputMapping->MapKey(Action, Key); };
 	auto Neg = []() { UInputModifierNegate* M = NewObject<UInputModifierNegate>(); return M; };
