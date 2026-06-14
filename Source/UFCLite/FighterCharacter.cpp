@@ -41,41 +41,35 @@ AFighterCharacter::AFighterCharacter()
 		}
 	}
 
-	InputMapping = CreateDefaultSubobject<UInputMappingContext>(TEXT("InputMapping"));
-	MoveForwardAction = CreateDefaultSubobject<UInputAction>(TEXT("MoveForwardAction"));
-	MoveRightAction = CreateDefaultSubobject<UInputAction>(TEXT("MoveRightAction"));
-	FaceLeftAction = CreateDefaultSubobject<UInputAction>(TEXT("FaceLeftAction"));
-	FaceTopAction = CreateDefaultSubobject<UInputAction>(TEXT("FaceTopAction"));
-	FaceRightAction = CreateDefaultSubobject<UInputAction>(TEXT("FaceRightAction"));
-	FaceBottomAction = CreateDefaultSubobject<UInputAction>(TEXT("FaceBottomAction"));
-	KickModifierAction = CreateDefaultSubobject<UInputAction>(TEXT("KickModifierAction"));
-	BlockAction = CreateDefaultSubobject<UInputAction>(TEXT("BlockAction"));
-
-	MoveForwardAction->ValueType = EInputActionValueType::Axis1D;
-	MoveRightAction->ValueType = EInputActionValueType::Axis1D;
-	FaceLeftAction->ValueType = EInputActionValueType::Boolean;
-	FaceTopAction->ValueType = EInputActionValueType::Boolean;
-	FaceRightAction->ValueType = EInputActionValueType::Boolean;
-	FaceBottomAction->ValueType = EInputActionValueType::Boolean;
-	KickModifierAction->ValueType = EInputActionValueType::Boolean;
-	BlockAction->ValueType = EInputActionValueType::Boolean;
-
 	bKickModifierHeld = false;
 	bBlockHeld = false;
-
-	SetupEnhancedInput();
 }
 
 void AFighterCharacter::SetupEnhancedInput()
 {
+	auto NewA = [this](EInputActionValueType T, const TCHAR* N)
+	{
+		UInputAction* A = NewObject<UInputAction>(this, N);
+		A->ValueType = T;
+		return A;
+	};
 
-	auto Map = [this](UInputAction* Action, FKey Key) { return InputMapping->MapKey(Action, Key); };
-	auto Neg = []() { UInputModifierNegate* M = NewObject<UInputModifierNegate>(); return M; };
+	InputMapping = NewObject<UInputMappingContext>(this, TEXT("IMC"));
+	MoveForwardAction = NewA(EInputActionValueType::Axis1D, TEXT("MoveFwd"));
+	MoveRightAction = NewA(EInputActionValueType::Axis1D, TEXT("MoveRight"));
+	FaceLeftAction = NewA(EInputActionValueType::Boolean, TEXT("FaceL"));
+	FaceTopAction = NewA(EInputActionValueType::Boolean, TEXT("FaceT"));
+	FaceRightAction = NewA(EInputActionValueType::Boolean, TEXT("FaceR"));
+	FaceBottomAction = NewA(EInputActionValueType::Boolean, TEXT("FaceB"));
+	KickModifierAction = NewA(EInputActionValueType::Boolean, TEXT("KickMod"));
+	BlockAction = NewA(EInputActionValueType::Boolean, TEXT("Block"));
+
+	auto Map = [this](UInputAction* A, FKey K) { InputMapping->MapKey(A, K); };
 
 	Map(MoveForwardAction, EKeys::W);
-	Map(MoveForwardAction, EKeys::S).Modifiers.Add(Neg());
-	Map(MoveForwardAction, EKeys::Gamepad_LeftY).Modifiers.Add(Neg());
-	Map(MoveRightAction, EKeys::A).Modifiers.Add(Neg());
+	Map(MoveForwardAction, EKeys::S).Modifiers.Add(NewObject<UInputModifierNegate>());
+	Map(MoveForwardAction, EKeys::Gamepad_LeftY).Modifiers.Add(NewObject<UInputModifierNegate>());
+	Map(MoveRightAction, EKeys::A).Modifiers.Add(NewObject<UInputModifierNegate>());
 	Map(MoveRightAction, EKeys::D);
 	Map(MoveRightAction, EKeys::Gamepad_LeftX);
 
@@ -96,6 +90,8 @@ void AFighterCharacter::SetupEnhancedInput()
 void AFighterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetupEnhancedInput();
 
 	if (HealthComponent)
 	{
