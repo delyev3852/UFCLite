@@ -7,8 +7,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Framework/Application/SlateApplication.h"
-#include <mmsystem.h>
-#pragma comment(lib, "winmm.lib")
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "InputModifiers.h"
@@ -131,9 +129,7 @@ void AFighterCharacter::Tick(float DeltaTime)
 				Msg += FString::SanitizeFloat(PC->PlayerInput->GetKeyValue(EKeys::Gamepad_LeftY));
 			}
 		}
-		JOYINFOEX ji; ji.dwSize = sizeof(ji); ji.dwFlags = JOY_RETURNALL;
-		bool bJoy = (joyGetPosEx(0, &ji) == JOYERR_NOERROR);
-		Msg += FString::Printf(TEXT(" |Slate:%d Joy:%d"), FSlateApplication::Get().IsGamepadAttached() ? 1 : 0, bJoy ? 1 : 0);
+		Msg += FString::Printf(TEXT(" |Slate:%d"), FSlateApplication::Get().IsGamepadAttached() ? 1 : 0);
 		if (Msg.Len() > 12)
 		{
 			GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, Msg);
