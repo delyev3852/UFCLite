@@ -101,16 +101,6 @@ void AFighterCharacter::BeginPlay()
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &AFighterCharacter::OnDeath);
 	}
-
-	APlayerController* PC = Cast<APlayerController>(Controller);
-	if (PC)
-	{
-		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
-		if (Subsystem)
-		{
-			Subsystem->AddMappingContext(InputMapping, 0);
-		}
-	}
 }
 
 void AFighterCharacter::Tick(float DeltaTime)
@@ -126,6 +116,16 @@ void AFighterCharacter::Tick(float DeltaTime)
 void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	APlayerController* PC = Cast<APlayerController>(Controller);
+	if (PC)
+	{
+		UEnhancedInputLocalPlayerSubsystem* Sub = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+		if (Sub)
+		{
+			Sub->AddMappingContext(InputMapping, 0);
+		}
+	}
 
 	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (!EIC) return;
