@@ -3,33 +3,37 @@
 ## Суть
 Проект файтинга на UE5.7.4 (C++). 3D вид сбоку, два бойца, удары руками/ногами, блок, кровь/увечья на моделях. Геймпад. Никакой прогрессии.
 
-## Состояние
-- **UE5.7.4 C++ проект UFCLite создан на ПК**
-- Есть PLAN.md — полная спецификация
-- Есть Source/UFCLite/FighterCharacter.h — начальный C++ класс
-- Проект залит на GitHub (main)
+## Состояние (15.06.2026)
+- UE5.7.4 C++ проект UFCLite создан, залит на GitHub (main)
 - .gitignore добавлен
-- **В работе:** добавление C++ классов
+- **Готовые C++ классы:**
+  - FighterCharacter.h/cpp — персонаж, передвижение, все удары (джеб/кросс/хук/апперкот/лоу/мидл/хай-кик), блок (замедление), анимационные монтажи, выносливость
+  - HealthComponent.h/cpp — здоровье + выносливость, реген выносливости, репликация, события OnDeath/OnHealthChanged/OnStaminaChanged
+  - FightGameMode.h/cpp — спавн бойцов по PlayerStart, Possess для 2 игроков, EndFight
+  - MainPlayerController.h/cpp — заготовка контроллера
+- **Осталось добавить:** DamageSystem, FightHUD, BloodSystem, FighterSelectWidget, FighterAnimInstance
+- **Не настроено:** GameMode в Project Settings, Input Axis Mappings, анимации/монтажи (назначить в BP)
 
-## Критично
+## Критично: инструкция для компиляции
 При старте новой сессии:
 1. Прочитать этот файл + PLAN.md
 2. Прочитать Source/UFCLite/* (все текущие C++ файлы)
-3. Продолжить добавлять классы: FighterCharacter.cpp, HealthComponent, DamageSystem, FightGameMode, FightHUD, BloodSystem, FighterSelectWidget, MainPlayerController
+3. Сказать пользователю: открыть UE5, Open Project, дождаться компиляции
+4. Продолжить добавлять классы
 
-## Порядок действий (начать новую сессию)
-1. Прочитать PLAN.md
-2. Прочитать Source/UFCLite/* (все текущие C++ файлы)
-3. Продолжить добавлять классы: FighterCharacter.cpp, HealthComponent, DamageSystem, FightGameMode, FightHUD, BloodSystem, FighterSelectWidget, MainPlayerController
-4. После каждого блока — запросить пользователя закоммитить и запушить с ПК
+## Порядок добавления классов (следующие)
+1. DamageSystem.h/cpp — система расчёта урона
+2. FightHUD.h/cpp — интерфейс (полоски здоровья)
+3. BloodSystem.h/cpp — декали крови на моделях
+4. FighterSelectWidget.h/cpp — выбор персонажа
+5. FighterAnimInstance.h/cpp — анимационный блупринт
 
 ## Контекст пользователя
 - GitHub: delyev3852
 - ПК: Windows, UE5.7.4, RTX 5060, 16GB RAM
-- Пользователь не умеет программировать — давать чёткие инструкции для UE5 (Create C++ class → назвать имя → скопировать код)
+- Пользователь не умеет программировать — давать чёткие инструкции
 
 ## Правила работы
-- После добавления каждого C++ класса → инструкция пользователю: «Открой Visual Studio → создай класс → замени содержимое на код из репозитория → скомпилируй»
 - Держать код компилируемым
 - Не использовать платные ассеты
-- Персонажи — из Mixamo (бесплатный UE5 плагин или FBX)
+- Персонажи — из Mixamo

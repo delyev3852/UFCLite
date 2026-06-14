@@ -1,0 +1,144 @@
+#include "FighterCharacter.h"
+#include "HealthComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
+AFighterCharacter::AFighterCharacter()
+{
+	PrimaryActorTick.bCanEverTick = true;
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+	bIsBlocking = false;
+
+	bReplicates = true;
+}
+
+void AFighterCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &AFighterCharacter::OnDeath);
+	}
+}
+
+void AFighterCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (HealthComponent)
+	{
+		HealthComponent->TickRegen(DeltaTime);
+	}
+}
+
+void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("MoveForward", this, &AFighterCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AFighterCharacter::MoveRight);
+
+	PlayerInputComponent->BindAction("Jab", IE_Pressed, this, &AFighterCharacter::JabPunch);
+	PlayerInputComponent->BindAction("Cross", IE_Pressed, this, &AFighterCharacter::CrossPunch);
+	PlayerInputComponent->BindAction("Hook", IE_Pressed, this, &AFighterCharacter::HookPunch);
+	PlayerInputComponent->BindAction("Uppercut", IE_Pressed, this, &AFighterCharacter::UppercutPunch);
+
+	PlayerInputComponent->BindAction("LowKick", IE_Pressed, this, &AFighterCharacter::LowKick);
+	PlayerInputComponent->BindAction("MidKick", IE_Pressed, this, &AFighterCharacter::MidKick);
+	PlayerInputComponent->BindAction("HighKick", IE_Pressed, this, &AFighterCharacter::HighKick);
+
+	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &AFighterCharacter::StartBlock);
+	PlayerInputComponent->BindAction("Block", IE_Released, this, &AFighterCharacter::StopBlock);
+}
+
+void AFighterCharacter::MoveForward(float Value)
+{
+	if (Controller && Value != 0.0f)
+	{
+		const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(Direction, Value);
+	}
+}
+
+void AFighterCharacter::MoveRight(float Value)
+{
+	if (Controller && Value != 0.0f)
+	{
+		const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		AddMovementInput(Direction, Value);
+	}
+}
+
+void AFighterCharacter::JabPunch()
+{
+	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
+	PlayAnimMontage(JabMontage);
+}
+
+void AFighterCharacter::CrossPunch()
+{
+	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
+	PlayAnimMontage(CrossMontage);
+}
+
+void AFighterCharacter::HookPunch()
+{
+	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
+	PlayAnimMontage(HookMontage);
+}
+
+void AFighterCharacter::UppercutPunch()
+{
+	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
+	PlayAnimMontage(UppercutMontage);
+}
+
+void AFighterCharacter::LowKick()
+{
+	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
+	PlayAnimMontage(LowKickMontage);
+}
+
+void AFighterCharacter::MidKick()
+{
+	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
+	PlayAnimMontage(MidKickMontage);
+}
+
+void AFighterCharacter::HighKick()
+{
+	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
+	PlayAnimMontage(HighKickMontage);
+}
+
+void AFighterCharacter::StartBlock()
+{
+	bIsBlocking = true;
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed *= 0.5f;
+	}
+}
+
+void AFighterCharacter::StopBlock()
+{
+	bIsBlocking = false;
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed *= 2.0f;
+	}
+}
+
+void AFighterCharacter::LightAttack()
+{
+	JabPunch();
+}
+
+void AFighterCharacter::HeavyAttack()
+{
+	HookPunch();
+}

@@ -14,6 +14,8 @@ class UFCLITE_API AFighterCharacter : public ACharacter
 public:
 	AFighterCharacter();
 
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -44,14 +46,36 @@ protected:
 	void LightAttack();
 	void HeavyAttack();
 
+	UFUNCTION()
+	void OnDeath();
+
 	UPROPERTY(EditAnywhere)
 	float StaminaCostLight = 5.0f;
 
 	UPROPERTY(EditAnywhere)
 	float StaminaCostHeavy = 10.0f;
 
-	bool bIsBlocking;
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* JabMontage;
 
-	UFUNCTION()
-	void OnHit(AFighterCharacter* Attacker, float Damage);
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* CrossMontage;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* HookMontage;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* UppercutMontage;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* LowKickMontage;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* MidKickMontage;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* HighKickMontage;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsBlocking;
 };
