@@ -115,7 +115,7 @@ void AFighterCharacter::Tick(float DeltaTime)
 		APlayerController* PC = Cast<APlayerController>(Controller);
 		if (PC)
 		{
-			TArray<FKey> Keys = {EKeys::Gamepad_FaceButton_Left, EKeys::Gamepad_FaceButton_Top, EKeys::Gamepad_FaceButton_Right, EKeys::Gamepad_FaceButton_Bottom, EKeys::Gamepad_LeftTrigger, EKeys::Gamepad_RightTrigger, EKeys::Gamepad_LeftShoulder, EKeys::Gamepad_RightShoulder, EKeys::FKey(TEXT("DualShock4_LeftFaceButton")), EKeys::FKey(TEXT("DualSense_LeftFaceButton")), EKeys::FKey(TEXT("PS4_Cross")), EKeys::FKey(TEXT("PS5_Cross"))};
+			static FKey Keys[] = {EKeys::Gamepad_FaceButton_Left, EKeys::Gamepad_FaceButton_Top, EKeys::Gamepad_FaceButton_Right, EKeys::Gamepad_FaceButton_Bottom, EKeys::Gamepad_LeftTrigger, EKeys::Gamepad_RightTrigger, EKeys::Gamepad_LeftShoulder, EKeys::Gamepad_RightShoulder};
 			for (auto& K : Keys)
 			{
 				if (PC->WasInputKeyJustPressed(K)) { Msg += K.ToString() + TEXT("!"); }
