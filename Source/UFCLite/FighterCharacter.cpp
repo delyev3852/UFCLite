@@ -57,42 +57,38 @@ void AFighterCharacter::SetupEnhancedInput()
 
 	MoveForwardAction = NewAction(EInputActionValueType::Axis1D);
 	MoveRightAction = NewAction(EInputActionValueType::Axis1D);
-	JabAction = NewAction(EInputActionValueType::Boolean);
-	CrossAction = NewAction(EInputActionValueType::Boolean);
-	HookAction = NewAction(EInputActionValueType::Boolean);
-	UppercutAction = NewAction(EInputActionValueType::Boolean);
-	LowKickAction = NewAction(EInputActionValueType::Boolean);
-	MidKickAction = NewAction(EInputActionValueType::Boolean);
-	HighKickAction = NewAction(EInputActionValueType::Boolean);
+	FaceLeftAction = NewAction(EInputActionValueType::Boolean);
+	FaceTopAction = NewAction(EInputActionValueType::Boolean);
+	FaceRightAction = NewAction(EInputActionValueType::Boolean);
+	FaceBottomAction = NewAction(EInputActionValueType::Boolean);
+	KickModifierAction = NewAction(EInputActionValueType::Boolean);
 	BlockAction = NewAction(EInputActionValueType::Boolean);
 
+	bKickModifierHeld = false;
+	bBlockHeld = false;
+
 	auto Map = [this](UInputAction* Action, FKey Key) { return InputMapping->MapKey(Action, Key); };
-	auto Negate = [this]() { return NewObject<UInputModifierNegate>(); };
+	auto Neg = []() { UInputModifierNegate* M = NewObject<UInputModifierNegate>(); return M; };
 
 	Map(MoveForwardAction, EKeys::W);
-	Map(MoveForwardAction, EKeys::S).Modifiers.Add(Negate());
-	Map(MoveForwardAction, EKeys::Gamepad_LeftY).Modifiers.Add(Negate());
-	Map(MoveRightAction, EKeys::A).Modifiers.Add(Negate());
+	Map(MoveForwardAction, EKeys::S).Modifiers.Add(Neg());
+	Map(MoveForwardAction, EKeys::Gamepad_LeftY).Modifiers.Add(Neg());
+	Map(MoveRightAction, EKeys::A).Modifiers.Add(Neg());
 	Map(MoveRightAction, EKeys::D);
 	Map(MoveRightAction, EKeys::Gamepad_LeftX);
 
-	Map(JabAction, EKeys::X);
-	Map(JabAction, EKeys::Gamepad_FaceButton_Left);
-	Map(CrossAction, EKeys::Y);
-	Map(CrossAction, EKeys::Gamepad_FaceButton_Top);
-	Map(HookAction, EKeys::B);
-	Map(HookAction, EKeys::Gamepad_FaceButton_Right);
-	Map(UppercutAction, EKeys::A);
-	Map(UppercutAction, EKeys::Gamepad_FaceButton_Bottom);
+	Map(FaceLeftAction, EKeys::X);
+	Map(FaceLeftAction, EKeys::Gamepad_FaceButton_Left);
+	Map(FaceTopAction, EKeys::Y);
+	Map(FaceTopAction, EKeys::Gamepad_FaceButton_Top);
+	Map(FaceRightAction, EKeys::B);
+	Map(FaceRightAction, EKeys::Gamepad_FaceButton_Right);
+	Map(FaceBottomAction, EKeys::A);
+	Map(FaceBottomAction, EKeys::Gamepad_FaceButton_Bottom);
 
-	Map(LowKickAction, EKeys::Q);
-	Map(LowKickAction, EKeys::Gamepad_LeftShoulder);
-	Map(MidKickAction, EKeys::E);
-	Map(MidKickAction, EKeys::Gamepad_RightShoulder);
-	Map(HighKickAction, EKeys::R);
-
+	Map(KickModifierAction, EKeys::Gamepad_RightTrigger);
 	Map(BlockAction, EKeys::LeftShift);
-	Map(BlockAction, EKeys::Gamepad_LeftTrigger);
+	Map(BlockAction, EKeys::Gamepad_RightShoulder);
 }
 
 void AFighterCharacter::BeginPlay()
@@ -135,14 +131,13 @@ void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	EIC->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AFighterCharacter::MoveForward);
 	EIC->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AFighterCharacter::MoveRight);
 
-	EIC->BindAction(JabAction, ETriggerEvent::Started, this, &AFighterCharacter::JabPunch);
-	EIC->BindAction(CrossAction, ETriggerEvent::Started, this, &AFighterCharacter::CrossPunch);
-	EIC->BindAction(HookAction, ETriggerEvent::Started, this, &AFighterCharacter::HookPunch);
-	EIC->BindAction(UppercutAction, ETriggerEvent::Started, this, &AFighterCharacter::UppercutPunch);
+	EIC->BindAction(FaceLeftAction, ETriggerEvent::Started, this, &AFighterCharacter::LeadJab);
+	EIC->BindAction(FaceTopAction, ETriggerEvent::Started, this, &AFighterCharacter::LeadCross);
+	EIC->BindAction(FaceRightAction, ETriggerEvent::Started, this, &AFighterCharacter::LeadHook);
+	EIC->BindAction(FaceBottomAction, ETriggerEvent::Started, this, &AFighterCharacter::LeadUppercut);
 
-	EIC->BindAction(LowKickAction, ETriggerEvent::Started, this, &AFighterCharacter::LowKick);
-	EIC->BindAction(MidKickAction, ETriggerEvent::Started, this, &AFighterCharacter::MidKick);
-	EIC->BindAction(HighKickAction, ETriggerEvent::Started, this, &AFighterCharacter::HighKick);
+	EIC->BindAction(KickModifierAction, ETriggerEvent::Started, this, &AFighterCharacter::OnKickModifier);
+	EIC->BindAction(KickModifierAction, ETriggerEvent::Completed, this, &AFighterCharacter::OnKickModifier);
 
 	EIC->BindAction(BlockAction, ETriggerEvent::Started, this, &AFighterCharacter::StartBlock);
 	EIC->BindAction(BlockAction, ETriggerEvent::Completed, this, &AFighterCharacter::StopBlock);
@@ -162,46 +157,68 @@ void AFighterCharacter::MoveRight(const FInputActionValue& Value)
 	AddMovementInput(FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y), Value.Get<float>());
 }
 
-void AFighterCharacter::JabPunch()
+void AFighterCharacter::LeadJab()
 {
+	if (bKickModifierHeld) { RearKickLow(); return; }
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
 	PlayAnimMontage(JabMontage);
 }
 
-void AFighterCharacter::CrossPunch()
+void AFighterCharacter::LeadCross()
 {
+	if (bKickModifierHeld) { RearKickMid(); return; }
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
 	PlayAnimMontage(CrossMontage);
 }
 
-void AFighterCharacter::HookPunch()
+void AFighterCharacter::LeadHook()
 {
+	if (bKickModifierHeld) { RearKickHigh(); return; }
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
 	PlayAnimMontage(HookMontage);
 }
 
-void AFighterCharacter::UppercutPunch()
+void AFighterCharacter::LeadUppercut()
 {
+	if (bKickModifierHeld) { RearKickBody(); return; }
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
 	PlayAnimMontage(UppercutMontage);
 }
 
-void AFighterCharacter::LowKick()
+void AFighterCharacter::RearKickLow()
 {
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
 	PlayAnimMontage(LowKickMontage);
 }
 
-void AFighterCharacter::MidKick()
+void AFighterCharacter::RearKickMid()
 {
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
 	PlayAnimMontage(MidKickMontage);
 }
 
-void AFighterCharacter::HighKick()
+void AFighterCharacter::RearKickHigh()
 {
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
 	PlayAnimMontage(HighKickMontage);
+}
+
+void AFighterCharacter::RearKickBody()
+{
+	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
+	PlayAnimMontage(JabMontage);
+}
+
+void AFighterCharacter::OnKickModifier(const FInputActionValue& Value)
+{
+	bKickModifierHeld = Value.Get<bool>();
+}
+
+void AFighterCharacter::OnBlockModifier(const FInputActionValue& Value)
+{
+	bBlockHeld = Value.Get<bool>();
+	if (bBlockHeld) StartBlock();
+	else StopBlock();
 }
 
 void AFighterCharacter::StartBlock()
@@ -224,12 +241,12 @@ void AFighterCharacter::StopBlock()
 
 void AFighterCharacter::LightAttack()
 {
-	JabPunch();
+	LeadJab();
 }
 
 void AFighterCharacter::HeavyAttack()
 {
-	HookPunch();
+	LeadHook();
 }
 
 void AFighterCharacter::OnDeath()

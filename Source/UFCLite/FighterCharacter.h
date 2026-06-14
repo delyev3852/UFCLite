@@ -33,15 +33,21 @@ public:
 protected:
 	void MoveForward(const FInputActionValue& Value);
 	void MoveRight(const FInputActionValue& Value);
-	void JabPunch();
-	void CrossPunch();
-	void HookPunch();
-	void UppercutPunch();
-	void LowKick();
-	void MidKick();
-	void HighKick();
+
+	void LeadJab();
+	void LeadCross();
+	void LeadHook();
+	void LeadUppercut();
+	void RearKickLow();
+	void RearKickMid();
+	void RearKickHigh();
+	void RearKickBody();
+
 	void StartBlock();
 	void StopBlock();
+	void OnKickModifier(const FInputActionValue& Value);
+	void OnBlockModifier(const FInputActionValue& Value);
+
 	void LightAttack();
 	void HeavyAttack();
 
@@ -60,28 +66,25 @@ protected:
 	UInputAction* MoveRightAction;
 
 	UPROPERTY()
-	UInputAction* JabAction;
+	UInputAction* FaceLeftAction;
 
 	UPROPERTY()
-	UInputAction* CrossAction;
+	UInputAction* FaceTopAction;
 
 	UPROPERTY()
-	UInputAction* HookAction;
+	UInputAction* FaceRightAction;
 
 	UPROPERTY()
-	UInputAction* UppercutAction;
+	UInputAction* FaceBottomAction;
 
 	UPROPERTY()
-	UInputAction* LowKickAction;
-
-	UPROPERTY()
-	UInputAction* MidKickAction;
-
-	UPROPERTY()
-	UInputAction* HighKickAction;
+	UInputAction* KickModifierAction;
 
 	UPROPERTY()
 	UInputAction* BlockAction;
+
+	bool bKickModifierHeld;
+	bool bBlockHeld;
 
 	UPROPERTY(EditAnywhere)
 	float StaminaCostLight = 5.0f;
