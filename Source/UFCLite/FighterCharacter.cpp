@@ -143,16 +143,12 @@ void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFighterCharacter::MoveForward(const FInputActionValue& Value)
 {
-	if (!Controller) return;
-	const FRotator YawRot(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
-	AddMovementInput(FRotationMatrix(YawRot).GetUnitAxis(EAxis::X), Value.Get<float>());
+	AddMovementInput(GetActorForwardVector(), Value.Get<float>());
 }
 
 void AFighterCharacter::MoveRight(const FInputActionValue& Value)
 {
-	if (!Controller) return;
-	const FRotator YawRot(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
-	AddMovementInput(FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y), Value.Get<float>());
+	AddMovementInput(GetActorRightVector(), Value.Get<float>());
 }
 
 void AFighterCharacter::LeadJab()
