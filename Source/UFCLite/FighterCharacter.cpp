@@ -65,13 +65,9 @@ AFighterCharacter::AFighterCharacter()
 
 	SetupEnhancedInput();
 }
-	}
-
-}
 
 void AFighterCharacter::SetupEnhancedInput()
 {
-	InputMapping = NewObject<UInputMappingContext>(this);
 
 	auto Map = [this](UInputAction* Action, FKey Key) { return InputMapping->MapKey(Action, Key); };
 	auto Neg = []() { UInputModifierNegate* M = NewObject<UInputModifierNegate>(); return M; };
