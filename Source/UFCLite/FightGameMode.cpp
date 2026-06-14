@@ -4,7 +4,7 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
-#include "Engine/CameraActor.h"
+#include "Camera/CameraActor.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/StaticMeshActor.h"
 #include "UObject/ConstructorHelpers.h"
