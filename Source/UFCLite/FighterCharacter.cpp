@@ -142,6 +142,16 @@ void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAxisKey(EKeys::Gamepad_LeftX, this, &AFighterCharacter::MoveRightLegacy);
 	PlayerInputComponent->BindAxisKey(EKeys::Gamepad_LeftY, this, &AFighterCharacter::MoveForwardLegacy);
+
+	PlayerInputComponent->BindAction("Jab", IE_Pressed, this, &AFighterCharacter::LeadJab);
+	PlayerInputComponent->BindAction("Cross", IE_Pressed, this, &AFighterCharacter::LeadCross);
+	PlayerInputComponent->BindAction("Hook", IE_Pressed, this, &AFighterCharacter::LeadHook);
+	PlayerInputComponent->BindAction("Uppercut", IE_Pressed, this, &AFighterCharacter::LeadUppercut);
+	PlayerInputComponent->BindAction("LowKick", IE_Pressed, this, &AFighterCharacter::RearKickLow);
+	PlayerInputComponent->BindAction("MidKick", IE_Pressed, this, &AFighterCharacter::RearKickMid);
+	PlayerInputComponent->BindAction("HighKick", IE_Pressed, this, &AFighterCharacter::RearKickHigh);
+	PlayerInputComponent->BindAction("Block", IE_Pressed, this, &AFighterCharacter::StartBlock);
+	PlayerInputComponent->BindAction("Block", IE_Released, this, &AFighterCharacter::StopBlock);
 }
 
 void AFighterCharacter::MoveForward(const FInputActionValue& Value)
