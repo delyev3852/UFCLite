@@ -3,6 +3,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 AFighterCharacter::AFighterCharacter()
 {
@@ -22,7 +24,22 @@ AFighterCharacter::AFighterCharacter()
 
 	bIsBlocking = false;
 	bReplicates = true;
-}
+
+	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+
+	UStaticMeshComponent* VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualBody"));
+	VisualMesh->SetupAttachment(RootComponent);
+	VisualMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -50.0f));
+	VisualMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 2.0f));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> BodyMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
+	if (BodyMesh.Succeeded())
+	{
+		VisualMesh->SetStaticMesh(BodyMesh.Object);
+		VisualMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		VisualMesh->SetIsReplicated(true);
+	}
 
 void AFighterCharacter::BeginPlay()
 {
