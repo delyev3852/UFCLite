@@ -4,16 +4,41 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "Engine/StaticMeshActor.h"
+#include "UObject/ConstructorHelpers.h"
 
 AFightGameMode::AFightGameMode()
 {
 	DefaultPawnClass = nullptr;
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloorAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	if (FloorAsset.Succeeded())
+	{
+		FloorMesh = FloorAsset.Object;
+	}
 }
 
 void AFightGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	SpawnArenaFloor();
 	SpawnFighters();
+}
+
+void AFightGameMode::SpawnArenaFloor()
+{
+	if (!FloorMesh || !GetWorld()) return;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AStaticMeshActor* Floor = GetWorld()->SpawnActor<AStaticMeshActor>(FVector(0.0f, 0.0f, -60.0f), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+	if (Floor)
+	{
+		Floor->SetMobility(EComponentMobility::Stationary);
+		Floor->GetStaticMeshComponent()->SetStaticMesh(FloorMesh);
+		Floor->SetActorScale3D(FVector(50.0f, 50.0f, 0.5f));
+		Floor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
 }
 
 void AFightGameMode::SpawnFighters()

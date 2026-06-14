@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Engine/StaticMesh.h"
 #include "FightGameMode.generated.h"
 
 class AFighterCharacter;
@@ -23,8 +24,12 @@ public:
 	void EndFight(AFighterCharacter* Winner);
 
 protected:
+	void SpawnArenaFloor();
 	void SpawnFighters();
 	void SetupFighterInput(AFighterCharacter* Fighter, int32 PlayerIndex);
+
+	UPROPERTY()
+	UStaticMesh* FloorMesh;
 
 	UPROPERTY()
 	AFighterCharacter* Fighter1;
