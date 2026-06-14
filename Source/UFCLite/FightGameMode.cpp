@@ -22,6 +22,9 @@ AFightGameMode::AFightGameMode()
 void AFightGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UGameplayStatics::CreatePlayer(this, 1, true);
+
 	SpawnArenaFloor();
 	SpawnFighters();
 }
@@ -37,7 +40,7 @@ void AFightGameMode::SpawnArenaFloor()
 	{
 		Floor->SetMobility(EComponentMobility::Stationary);
 		Floor->GetStaticMeshComponent()->SetStaticMesh(FloorMesh);
-		Floor->SetActorScale3D(FVector(50.0f, 50.0f, 0.5f));
+		Floor->SetActorScale3D(FVector(500.0f, 50.0f, 0.5f));
 		Floor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 }
@@ -64,8 +67,8 @@ void AFightGameMode::SpawnFighters()
 	}
 	else
 	{
-		SpawnPos[0] = FVector(-200.0f, 0.0f, 100.0f);
-		SpawnPos[1] = FVector(200.0f, 0.0f, 100.0f);
+		SpawnPos[0] = FVector(-150.0f, 0.0f, 100.0f);
+		SpawnPos[1] = FVector(150.0f, 0.0f, 100.0f);
 		SpawnRot[0] = FRotator(0.0f, 0.0f, 0.0f);
 		SpawnRot[1] = FRotator(0.0f, -180.0f, 0.0f);
 	}
