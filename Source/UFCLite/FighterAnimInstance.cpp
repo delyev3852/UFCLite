@@ -1,7 +1,6 @@
 #include "FighterAnimInstance.h"
 #include "FighterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetAnimationLibrary.h"
 
 void UFighterAnimInstance::NativeInitializeAnimation()
 {
@@ -19,7 +18,15 @@ void UFighterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (MoveComp)
 	{
 		Speed = MoveComp->Velocity.Size2D();
-		Direction = UKismetAnimationLibrary::CalculateDirection(MoveComp->Velocity, Character->GetActorRotation());
+		if (!MoveComp->Velocity.IsZero())
+		{
+			FVector RotatedVel = Character->GetActorRotation().UnrotateVector(MoveComp->Velocity);
+			Direction = FMath::Atan2(RotatedVel.Y, RotatedVel.X) * (180.0f / UE_PI);
+		}
+		else
+		{
+			Direction = 0.0f;
+		}
 	}
 
 	bIsBlocking = Character->bIsBlocking;
