@@ -1,7 +1,6 @@
 #include "FightGameMode.h"
 #include "FighterCharacter.h"
 #include "GameFramework/PlayerStart.h"
-#include "Engine/PlayerStartActor.h"
 #include "Kismet/GameplayStatics.h"
 
 AFightGameMode::AFightGameMode()

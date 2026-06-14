@@ -133,6 +133,12 @@ void AFighterCharacter::StopBlock()
 	}
 }
 
+void AFighterCharacter::OnDeath()
+{
+	GetCharacterMovement()->DisableMovement();
+	SetLifeSpan(3.0f);
+}
+
 void AFighterCharacter::LightAttack()
 {
 	JabPunch();
