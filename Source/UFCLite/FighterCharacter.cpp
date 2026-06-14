@@ -107,6 +107,25 @@ void AFighterCharacter::Tick(float DeltaTime)
 	{
 		HealthComponent->TickRegen(DeltaTime);
 	}
+
+	if (GEngine && (GetWorld() && GetWorld()->TimeSeconds - LastDebugTime > 0.5f))
+	{
+		LastDebugTime = GetWorld()->TimeSeconds;
+		bool bGPressed = false;
+		APlayerController* PC = Cast<APlayerController>(Controller);
+		if (PC)
+		{
+			bGPressed = PC->WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Left);
+		}
+		if (bGPressed)
+		{
+			GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, TEXT("Gamepad button detected!"));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Yellow, TEXT("No gamepad press"));
+		}
+	}
 }
 
 void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

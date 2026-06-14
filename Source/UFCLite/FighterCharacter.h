@@ -117,4 +117,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsBlocking;
+
+	float LastDebugTime = 0.0f;
 };
