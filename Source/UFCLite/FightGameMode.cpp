@@ -10,6 +10,7 @@
 AFightGameMode::AFightGameMode()
 {
 	DefaultPawnClass = nullptr;
+	FighterClass = AFighterCharacter::StaticClass();
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloorAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
 	if (FloorAsset.Succeeded())
