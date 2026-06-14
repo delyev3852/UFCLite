@@ -23,6 +23,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndFight(AFighterCharacter* Winner);
 
+	UFUNCTION(BlueprintPure)
+	AFighterCharacter* GetFighter1() const { return Fighter1; }
+
+	UFUNCTION(BlueprintPure)
+	AFighterCharacter* GetFighter2() const { return Fighter2; }
+
 protected:
 	void SpawnArenaFloor();
 	void SpawnFighters();

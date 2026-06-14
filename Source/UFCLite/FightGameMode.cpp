@@ -1,5 +1,6 @@
 #include "FightGameMode.h"
 #include "FighterCharacter.h"
+#include "FightHUD.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
@@ -10,6 +11,7 @@
 AFightGameMode::AFightGameMode()
 {
 	DefaultPawnClass = nullptr;
+	HUDClass = AFightHUD::StaticClass();
 	FighterClass = AFighterCharacter::StaticClass();
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloorAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
