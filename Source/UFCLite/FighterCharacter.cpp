@@ -2,6 +2,7 @@
 #include "HealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInterface.h"
 #include "UObject/ConstructorHelpers.h"
 
 AFighterCharacter::AFighterCharacter()
@@ -27,6 +28,12 @@ AFighterCharacter::AFighterCharacter()
 		VisualMesh->SetStaticMesh(BodyMesh.Object);
 		VisualMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		VisualMesh->SetIsReplicated(true);
+
+		static ConstructorHelpers::FObjectFinder<UMaterialInterface> BodyMat(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
+		if (BodyMat.Succeeded())
+		{
+			VisualMesh->SetMaterial(0, BodyMat.Object);
+		}
 	}
 }
 

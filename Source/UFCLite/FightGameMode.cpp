@@ -26,8 +26,6 @@ void AFightGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UGameplayStatics::CreatePlayer(this, 1, true);
-
 	SpawnArenaFloor();
 	SpawnArenaCamera();
 	SpawnFighters();
