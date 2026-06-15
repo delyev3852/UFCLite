@@ -91,12 +91,12 @@ void AFighterCharacter::SetupEnhancedInput()
 		Map(MoveRightAction, EKeys::Left).Modifiers.Add(NewObject<UInputModifierNegate>());
 		Map(MoveRightAction, EKeys::Right);
 
-		Map(FaceLeftAction, EKeys::NumPadOne);
-		Map(FaceTopAction, EKeys::NumPadTwo);
-		Map(FaceRightAction, EKeys::NumPadThree);
-		Map(FaceBottomAction, EKeys::NumPadFour);
+		Map(FaceLeftAction, EKeys::I);
+		Map(FaceTopAction, EKeys::O);
+		Map(FaceRightAction, EKeys::P);
+		Map(FaceBottomAction, EKeys::K);
 
-		Map(KickModifierAction, EKeys::NumPadZero);
+		Map(KickModifierAction, EKeys::L);
 		Map(BlockAction, EKeys::RightControl);
 	}
 
