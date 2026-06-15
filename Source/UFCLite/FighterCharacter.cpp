@@ -176,12 +176,6 @@ void AFighterCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	if (GEngine && (GetWorld() && GetWorld()->TimeSeconds - LastDebugTime > 0.5f))
-	{
-		LastDebugTime = GetWorld()->TimeSeconds;
-		FColor C = GetMesh()->GetSkeletalMeshAsset() ? FColor::Green : FColor::Yellow;
-		GEngine->AddOnScreenDebugMessage(1, 5.f, C, C == FColor::Green ? TEXT("Mannequin") : TEXT("Cylinder"));
-	}
 }
 
 void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
