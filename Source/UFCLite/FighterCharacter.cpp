@@ -1,4 +1,5 @@
 #include "FighterCharacter.h"
+#include "FightGameMode.h"
 #include "FighterAnimInstance.h"
 #include "HealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -12,6 +13,7 @@
 #include "InputModifiers.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Engine/World.h"
+#include "DrawDebugHelpers.h"
 
 AFighterCharacter::AFighterCharacter()
 {
@@ -322,6 +324,15 @@ void AFighterCharacter::OnDeath()
 	{
 		PlayAnimMontage(DeathMontage);
 	}
+
+	SpawnBloodEffect(GetActorLocation());
+
+	AFightGameMode* GM = Cast<AFightGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM)
+	{
+		GM->EndFight(this);
+	}
+
 	SetLifeSpan(3.0f);
 }
 
@@ -367,6 +378,7 @@ bool AFighterCharacter::PerformAttackTrace(float Damage)
 
 			Victim->HealthComponent->TakeDamage(FinalDamage);
 			Victim->HitReact();
+			SpawnBloodEffect(Hit.Location);
 
 			if (GEngine)
 			{
@@ -383,4 +395,19 @@ bool AFighterCharacter::PerformAttackTrace(float Damage)
 		}
 	}
 	return false;
+}
+
+void AFighterCharacter::SpawnBloodEffect(const FVector& Location)
+{
+	if (!GetWorld()) return;
+
+	DrawDebugSphere(GetWorld(), Location, 15.f, 8, FColor::Red, false, 0.4f);
+
+	for (int32 i = 0; i < 5; i++)
+	{
+		FVector Dir = FMath::VRand();
+		Dir.Z = FMath::Abs(Dir.Z);
+		FVector End = Location + Dir * FMath::RandRange(20.f, 60.f);
+		DrawDebugLine(GetWorld(), Location, End, FColor::Red, false, 0.3f);
+	}
 }

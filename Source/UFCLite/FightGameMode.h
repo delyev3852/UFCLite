@@ -47,4 +47,7 @@ protected:
 
 	UPROPERTY()
 	ACameraActor* ArenaCamera;
+
+	bool bFightOver = false;
+	AFighterCharacter* Winner = nullptr;
 };

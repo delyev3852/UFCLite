@@ -23,6 +23,15 @@ void AFightHUD::DrawHUD()
 
 	DrawFighterBars(F1, Pad, Top, BarW, BarH);
 	DrawFighterBars(F2, Canvas->SizeX - Pad - BarW, Top, BarW, BarH);
+
+	if (GM->bFightOver && GM->Winner)
+	{
+		FString KoText = GM->Winner->PlayerIndex == 0 ? TEXT("PLAYER 1 WINS!") : TEXT("PLAYER 2 WINS!");
+		float TW, TH;
+		GetTextSize(KoText, TW, TH, nullptr, 3.f);
+		FLinearColor KoColor = GM->Winner->PlayerIndex == 0 ? FLinearColor::Red : FLinearColor::Blue;
+		DrawText(KoText, KoColor, (Canvas->SizeX - TW) * 0.5f, (Canvas->SizeY - TH) * 0.5f, nullptr, 3.f);
+	}
 }
 
 void AFightHUD::DrawFighterBars(AFighterCharacter* Fighter, float X, float Y, float Width, float Height)

@@ -68,6 +68,7 @@ protected:
 
 	bool PerformAttackTrace(float Damage);
 	bool IsOpponent(AFighterCharacter* Other) const;
+	void SpawnBloodEffect(const FVector& Location);
 
 	UPROPERTY(EditAnywhere)
 	float AttackRange = 150.0f;

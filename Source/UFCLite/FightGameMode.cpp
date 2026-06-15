@@ -1,6 +1,7 @@
 #include "FightGameMode.h"
 #include "FighterCharacter.h"
 #include "FightHUD.h"
+#include "TimerManager.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
@@ -151,7 +152,21 @@ void AFightGameMode::SetupFighterInput(AFighterCharacter* Fighter, int32 InPlaye
 	}
 }
 
-void AFightGameMode::EndFight(AFighterCharacter* Winner)
+void AFightGameMode::EndFight(AFighterCharacter* Loser)
 {
-	if (!Winner) return;
+	if (!Loser || bFightOver) return;
+
+	bFightOver = true;
+	Winner = (Loser == Fighter1) ? Fighter2 : Fighter1;
+
+	if (Winner)
+	{
+		Winner->GetCharacterMovement()->DisableMovement();
+	}
+
+	FTimerHandle Timer;
+	GetWorldTimerManager().SetTimer(Timer, [this]()
+	{
+		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+	}, 5.0f, false);
 }
