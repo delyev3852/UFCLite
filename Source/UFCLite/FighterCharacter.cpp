@@ -136,14 +136,14 @@ void AFighterCharacter::Tick(float DeltaTime)
 
 	if (PlayerIndex == 1)
 	{
-		bool bUp    = (GetAsyncKeyState(VK_UP)    & 0x8000) != 0;
-		bool bDown  = (GetAsyncKeyState(VK_DOWN)  & 0x8000) != 0;
-		bool bLeft  = (GetAsyncKeyState(VK_LEFT)  & 0x8000) != 0;
-		bool bRight = (GetAsyncKeyState(VK_RIGHT) & 0x8000) != 0;
-		if (bUp)    AddMovementInput(FVector(0.f, -1.f, 0.f), 1.f);
-		if (bDown)  AddMovementInput(FVector(0.f, -1.f, 0.f), -1.f);
-		if (bRight) AddMovementInput(FVector(1.f, 0.f, 0.f), 1.f);
-		if (bLeft)  AddMovementInput(FVector(1.f, 0.f, 0.f), -1.f);
+		bool bW = (GetAsyncKeyState('W') & 0x8000) != 0;
+		bool bS = (GetAsyncKeyState('S') & 0x8000) != 0;
+		bool bA = (GetAsyncKeyState('A') & 0x8000) != 0;
+		bool bD = (GetAsyncKeyState('D') & 0x8000) != 0;
+		if (bW) AddMovementInput(FVector(0.f, -1.f, 0.f), 1.f);
+		if (bS) AddMovementInput(FVector(0.f, -1.f, 0.f), -1.f);
+		if (bD) AddMovementInput(FVector(1.f, 0.f, 0.f), 1.f);
+		if (bA) AddMovementInput(FVector(1.f, 0.f, 0.f), -1.f);
 
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (PC)
