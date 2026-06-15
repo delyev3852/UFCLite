@@ -17,6 +17,7 @@ public:
 	AFightGameMode();
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AFighterCharacter> FighterClass;

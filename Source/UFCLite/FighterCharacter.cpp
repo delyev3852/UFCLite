@@ -131,13 +131,50 @@ void AFighterCharacter::Tick(float DeltaTime)
 		HealthComponent->TickRegen(DeltaTime);
 	}
 
+	if (PlayerIndex == 1)
+	{
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC && PC->PlayerInput)
+		{
+			float Up    = PC->PlayerInput->GetKeyValue(EKeys::Up);
+			float Down  = PC->PlayerInput->GetKeyValue(EKeys::Down);
+			float Left  = PC->PlayerInput->GetKeyValue(EKeys::Left);
+			float Right = PC->PlayerInput->GetKeyValue(EKeys::Right);
+			AddMovementInput(FVector(0.f, -1.f, 0.f), Up - Down);
+			AddMovementInput(FVector(1.f, 0.f, 0.f), Right - Left);
+
+			bool bKick = PC->PlayerInput->GetKeyValue(EKeys::L) > 0.f;
+			if (bKick)
+			{
+				if (PC->WasInputKeyJustPressed(EKeys::I)) RearKickLow();
+				if (PC->WasInputKeyJustPressed(EKeys::O)) RearKickMid();
+				if (PC->WasInputKeyJustPressed(EKeys::P)) RearKickHigh();
+				if (PC->WasInputKeyJustPressed(EKeys::K)) RearKickBody();
+			}
+			else
+			{
+				if (PC->WasInputKeyJustPressed(EKeys::I)) LeadJab();
+				if (PC->WasInputKeyJustPressed(EKeys::O)) LeadCross();
+				if (PC->WasInputKeyJustPressed(EKeys::P)) LeadHook();
+				if (PC->WasInputKeyJustPressed(EKeys::K)) LeadUppercut();
+			}
+
+			if (PC->PlayerInput->GetKeyValue(EKeys::RightControl) > 0.f)
+			{
+				if (!bIsBlocking) StartBlock();
+			}
+			else
+			{
+				if (bIsBlocking) StopBlock();
+			}
+		}
+	}
+
 	if (GEngine && (GetWorld() && GetWorld()->TimeSeconds - LastDebugTime > 0.5f))
 	{
 		LastDebugTime = GetWorld()->TimeSeconds;
-		bool bHasSkel = GetMesh()->GetSkeletalMeshAsset() != nullptr;
-		FColor C = bHasSkel ? FColor::Green : FColor::Yellow;
-		GEngine->AddOnScreenDebugMessage(1, 5.f, C,
-			bHasSkel ? TEXT("Mannequin OK + cylinder") : TEXT("Cylinder only (no mannequin)"));
+		FColor C = GetMesh()->GetSkeletalMeshAsset() ? FColor::Green : FColor::Yellow;
+		GEngine->AddOnScreenDebugMessage(1, 5.f, C, C == FColor::Green ? TEXT("Mannequin") : TEXT("Cylinder"));
 	}
 }
 

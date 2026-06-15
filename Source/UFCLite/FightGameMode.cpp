@@ -135,21 +135,25 @@ void AFightGameMode::SetupFighterInput(AFighterCharacter* Fighter, int32 InPlaye
 
 	Fighter->PlayerIndex = InPlayerIndex;
 
-	if (InPlayerIndex == 1)
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (PC && InPlayerIndex == 0)
 	{
-		APlayerController* NewPC = UGameplayStatics::CreatePlayer(this, 1, true);
-		if (NewPC)
-		{
-			NewPC->Possess(Fighter);
-		}
+		PC->Possess(Fighter);
 	}
-	else
+}
+
+void AFightGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (ArenaCamera && Fighter1 && Fighter2)
 	{
-		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-		if (PC)
-		{
-			PC->Possess(Fighter);
-		}
+		FVector MidPoint = (Fighter1->GetActorLocation() + Fighter2->GetActorLocation()) * 0.5f;
+		float Dist = FVector::Dist(Fighter1->GetActorLocation(), Fighter2->GetActorLocation());
+		Dist = FMath::Clamp(Dist, 300.f, 800.f);
+		FVector CamPos = MidPoint + FVector(0.f, Dist * 0.8f, 200.f);
+		ArenaCamera->SetActorLocation(CamPos);
+		ArenaCamera->SetActorRotation((MidPoint - CamPos).Rotation());
 	}
 }
 
