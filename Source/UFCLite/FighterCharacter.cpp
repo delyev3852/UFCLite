@@ -2,6 +2,7 @@
 #include "FighterAnimInstance.h"
 #include "HealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -21,22 +22,25 @@ AFighterCharacter::AFighterCharacter()
 
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	GetMesh()->AnimClass = UFighterAnimInstance::StaticClass();
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MannequinMesh(TEXT("/Engine/EngineMeshes/SkeletalMannequin.SkeletalMannequin"));
 	if (MannequinMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(MannequinMesh.Object);
 	}
-	else
+
+	UStaticMeshComponent* VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualBody"));
+	VisualMesh->SetupAttachment(RootComponent);
+	VisualMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -50.0f));
+	VisualMesh->SetRelativeScale3D(FVector(1.0f, 1.0f, 2.0f));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> BodyMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
+	if (BodyMesh.Succeeded())
 	{
-		static ConstructorHelpers::FObjectFinder<USkeletalMesh> AltMannequin(TEXT("/Engine/EngineMeshes/SK_Mannequin.SK_Mannequin"));
-		if (AltMannequin.Succeeded())
-		{
-			GetMesh()->SetSkeletalMesh(AltMannequin.Object);
-		}
+		VisualMesh->SetStaticMesh(BodyMesh.Object);
+		VisualMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetMesh()->AnimClass = UFighterAnimInstance::StaticClass();
 
 	bKickModifierHeld = false;
 	bBlockHeld = false;
@@ -109,9 +113,10 @@ void AFighterCharacter::Tick(float DeltaTime)
 	if (GEngine && (GetWorld() && GetWorld()->TimeSeconds - LastDebugTime > 0.5f))
 	{
 		LastDebugTime = GetWorld()->TimeSeconds;
-		bool bHasSkelMesh = GetMesh()->GetSkeletalMeshAsset() != nullptr;
-		FColor C = bHasSkelMesh ? FColor::Green : FColor::Red;
-		GEngine->AddOnScreenDebugMessage(1, 5.f, C, bHasSkelMesh ? TEXT("Mesh: LOADED") : TEXT("Mesh: MISSING"));
+		bool bHasSkel = GetMesh()->GetSkeletalMeshAsset() != nullptr;
+		FColor C = bHasSkel ? FColor::Green : FColor::Yellow;
+		GEngine->AddOnScreenDebugMessage(1, 5.f, C,
+			bHasSkel ? TEXT("Mannequin OK + cylinder") : TEXT("Cylinder only (no mannequin)"));
 	}
 }
 
