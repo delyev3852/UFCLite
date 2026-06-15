@@ -69,33 +69,50 @@ void AFighterCharacter::SetupEnhancedInput()
 
 	auto Map = [this](UInputAction* A, FKey K) -> FEnhancedActionKeyMapping& { return InputMapping->MapKey(A, K); };
 
-	Map(MoveForwardAction, EKeys::W);
-	Map(MoveForwardAction, EKeys::S).Modifiers.Add(NewObject<UInputModifierNegate>());
+	if (PlayerIndex == 0)
+	{
+		Map(MoveForwardAction, EKeys::W);
+		Map(MoveForwardAction, EKeys::S).Modifiers.Add(NewObject<UInputModifierNegate>());
+		Map(MoveRightAction, EKeys::A).Modifiers.Add(NewObject<UInputModifierNegate>());
+		Map(MoveRightAction, EKeys::D);
+
+		Map(FaceLeftAction, EKeys::Z);
+		Map(FaceTopAction, EKeys::X);
+		Map(FaceRightAction, EKeys::C);
+		Map(FaceBottomAction, EKeys::V);
+
+		Map(KickModifierAction, EKeys::Tab);
+		Map(BlockAction, EKeys::LeftShift);
+	}
+	else
+	{
+		Map(MoveForwardAction, EKeys::Up);
+		Map(MoveForwardAction, EKeys::Down).Modifiers.Add(NewObject<UInputModifierNegate>());
+		Map(MoveRightAction, EKeys::Left).Modifiers.Add(NewObject<UInputModifierNegate>());
+		Map(MoveRightAction, EKeys::Right);
+
+		Map(FaceLeftAction, EKeys::NumPadOne);
+		Map(FaceTopAction, EKeys::NumPadTwo);
+		Map(FaceRightAction, EKeys::NumPadThree);
+		Map(FaceBottomAction, EKeys::NumPadFour);
+
+		Map(KickModifierAction, EKeys::NumPadZero);
+		Map(BlockAction, EKeys::RightControl);
+	}
+
 	Map(MoveForwardAction, EKeys::Gamepad_LeftY).Modifiers.Add(NewObject<UInputModifierNegate>());
-	Map(MoveRightAction, EKeys::A).Modifiers.Add(NewObject<UInputModifierNegate>());
-	Map(MoveRightAction, EKeys::D);
 	Map(MoveRightAction, EKeys::Gamepad_LeftX);
-
-	Map(FaceLeftAction, EKeys::Z);
 	Map(FaceLeftAction, EKeys::Gamepad_FaceButton_Left);
-	Map(FaceTopAction, EKeys::X);
 	Map(FaceTopAction, EKeys::Gamepad_FaceButton_Top);
-	Map(FaceRightAction, EKeys::C);
 	Map(FaceRightAction, EKeys::Gamepad_FaceButton_Right);
-	Map(FaceBottomAction, EKeys::V);
 	Map(FaceBottomAction, EKeys::Gamepad_FaceButton_Bottom);
-
-	Map(KickModifierAction, EKeys::Tab);
 	Map(KickModifierAction, EKeys::Gamepad_RightTrigger);
-	Map(BlockAction, EKeys::LeftShift);
 	Map(BlockAction, EKeys::Gamepad_RightShoulder);
 }
 
 void AFighterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SetupEnhancedInput();
 
 	if (HealthComponent)
 	{
@@ -125,6 +142,8 @@ void AFighterCharacter::Tick(float DeltaTime)
 void AFighterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	SetupEnhancedInput();
 
 	APlayerController* PC = Cast<APlayerController>(Controller);
 	if (PC)

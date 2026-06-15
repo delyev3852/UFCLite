@@ -127,14 +127,27 @@ void AFightGameMode::SpawnFighters()
 	}
 }
 
-void AFightGameMode::SetupFighterInput(AFighterCharacter* Fighter, int32 PlayerIndex)
+void AFightGameMode::SetupFighterInput(AFighterCharacter* Fighter, int32 InPlayerIndex)
 {
 	if (!Fighter) return;
 
-	APlayerController* PC = UGameplayStatics::GetPlayerController(this, PlayerIndex);
-	if (PC)
+	Fighter->PlayerIndex = InPlayerIndex;
+
+	if (InPlayerIndex == 1)
 	{
-		PC->Possess(Fighter);
+		APlayerController* NewPC = UGameplayStatics::CreatePlayer(this, 1, true);
+		if (NewPC)
+		{
+			NewPC->Possess(Fighter);
+		}
+	}
+	else
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+		if (PC)
+		{
+			PC->Possess(Fighter);
+		}
 	}
 }
 

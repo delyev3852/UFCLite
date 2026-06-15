@@ -36,6 +36,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsDead = false;
 
+	int32 PlayerIndex = 0;
+
 protected:
 	void MoveForward(const FInputActionValue& Value);
 	void MoveRight(const FInputActionValue& Value);
@@ -103,7 +105,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float BodyKickDamage = 10.0f;
 
-	void SetupEnhancedInput();
+	void SetupEnhancedInput(int32 InPlayerIndex = 0);
 
 	UPROPERTY()
 	UInputMappingContext* InputMapping;
