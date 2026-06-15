@@ -136,7 +136,9 @@ void AFighterCharacter::Tick(float DeltaTime)
 
 	if (PlayerIndex == 1)
 	{
-		AddMovementInput(FVector(0.f, -1.f, 0.f), 1.f);
+		FVector Loc = GetActorLocation();
+		Loc.Y -= 100.f * DeltaTime;
+		SetActorLocation(Loc, true);
 
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (PC)
