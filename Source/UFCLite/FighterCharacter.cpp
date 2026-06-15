@@ -136,9 +136,20 @@ void AFighterCharacter::Tick(float DeltaTime)
 
 	if (PlayerIndex == 1)
 	{
-		FVector Loc = GetActorLocation();
-		Loc.Y -= 100.f * DeltaTime;
-		SetActorLocation(Loc, true);
+		bool bUp    = (GetAsyncKeyState(VK_UP)    & 0x8000) != 0;
+		bool bDown  = (GetAsyncKeyState(VK_DOWN)  & 0x8000) != 0;
+		bool bLeft  = (GetAsyncKeyState(VK_LEFT)  & 0x8000) != 0;
+		bool bRight = (GetAsyncKeyState(VK_RIGHT) & 0x8000) != 0;
+		FVector Dir(0.f, 0.f, 0.f);
+		if (bUp)    Dir.Y -= 1.f;
+		if (bDown)  Dir.Y += 1.f;
+		if (bRight) Dir.X += 1.f;
+		if (bLeft)  Dir.X -= 1.f;
+		if (!Dir.IsZero())
+		{
+			Dir.Normalize();
+			AddActorWorldOffset(Dir * GetCharacterMovement()->MaxWalkSpeed * DeltaTime, true);
+		}
 
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (PC)
