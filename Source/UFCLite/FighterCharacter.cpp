@@ -10,6 +10,8 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "InputModifiers.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Engine/World.h"
 
 AFighterCharacter::AFighterCharacter()
 {
@@ -189,6 +191,7 @@ void AFighterCharacter::LeadJab()
 {
 	if (bKickModifierHeld) { RearKickLow(); return; }
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
+	PerformAttackTrace(JabDamage);
 	PlayAnimMontage(JabMontage);
 }
 
@@ -196,6 +199,7 @@ void AFighterCharacter::LeadCross()
 {
 	if (bKickModifierHeld) { RearKickMid(); return; }
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
+	PerformAttackTrace(CrossDamage);
 	PlayAnimMontage(CrossMontage);
 }
 
@@ -203,6 +207,7 @@ void AFighterCharacter::LeadHook()
 {
 	if (bKickModifierHeld) { RearKickHigh(); return; }
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
+	PerformAttackTrace(HookDamage);
 	PlayAnimMontage(HookMontage);
 }
 
@@ -210,30 +215,35 @@ void AFighterCharacter::LeadUppercut()
 {
 	if (bKickModifierHeld) { RearKickBody(); return; }
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
+	PerformAttackTrace(UppercutDamage);
 	PlayAnimMontage(UppercutMontage);
 }
 
 void AFighterCharacter::RearKickLow()
 {
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
+	PerformAttackTrace(LowKickDamage);
 	PlayAnimMontage(LowKickMontage);
 }
 
 void AFighterCharacter::RearKickMid()
 {
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostLight)) return;
+	PerformAttackTrace(MidKickDamage);
 	PlayAnimMontage(MidKickMontage);
 }
 
 void AFighterCharacter::RearKickHigh()
 {
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
+	PerformAttackTrace(HighKickDamage);
 	PlayAnimMontage(HighKickMontage);
 }
 
 void AFighterCharacter::RearKickBody()
 {
 	if (!HealthComponent || !HealthComponent->ConsumeStamina(StaminaCostHeavy)) return;
+	PerformAttackTrace(BodyKickDamage);
 	PlayAnimMontage(JabMontage);
 }
 
@@ -294,4 +304,64 @@ void AFighterCharacter::OnDeath()
 		PlayAnimMontage(DeathMontage);
 	}
 	SetLifeSpan(3.0f);
+}
+
+bool AFighterCharacter::IsOpponent(AFighterCharacter* Other) const
+{
+	return Other && Other != this && !Other->bIsDead;
+}
+
+bool AFighterCharacter::PerformAttackTrace(float Damage)
+{
+	if (!GetWorld()) return false;
+
+	FVector Start = GetActorLocation();
+	FVector Forward = GetActorForwardVector();
+	FVector End = Start + Forward * AttackRange;
+
+	TArray<AActor*> Ignored;
+	Ignored.Add(this);
+
+	FHitResult Hit;
+	bool bHit = UKismetSystemLibrary::SphereTraceSingle(
+		GetWorld(),
+		Start, End,
+		AttackRadius,
+		UEngineTypes::ConvertToTraceType(ECC_Pawn),
+		false,
+		Ignored,
+		EDrawDebugTrace::ForDuration,
+		Hit,
+		true
+	);
+
+	if (bHit && Hit.GetActor())
+	{
+		AFighterCharacter* Victim = Cast<AFighterCharacter>(Hit.GetActor());
+		if (IsOpponent(Victim) && Victim->HealthComponent)
+		{
+			float FinalDamage = Damage;
+			if (Victim->bIsBlocking)
+			{
+				FinalDamage *= BlockDamageMultiplier;
+			}
+
+			Victim->HealthComponent->TakeDamage(FinalDamage);
+			Victim->HitReact();
+
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Orange,
+					FString::Printf(TEXT("%.0f dmg"), FinalDamage),
+					true, FVector2D(4.f, 4.f));
+			}
+
+			FVector KnockDir = (Victim->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+			KnockDir.Z = 0.2f;
+			Victim->LaunchCharacter(KnockDir * KnockbackForce, false, false);
+
+			return true;
+		}
+	}
+	return false;
 }

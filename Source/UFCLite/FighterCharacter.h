@@ -64,6 +64,45 @@ protected:
 
 	void HitReact();
 
+	bool PerformAttackTrace(float Damage);
+	bool IsOpponent(AFighterCharacter* Other) const;
+
+	UPROPERTY(EditAnywhere)
+	float AttackRange = 150.0f;
+
+	UPROPERTY(EditAnywhere)
+	float AttackRadius = 30.0f;
+
+	UPROPERTY(EditAnywhere)
+	float KnockbackForce = 500.0f;
+
+	UPROPERTY(EditAnywhere)
+	float BlockDamageMultiplier = 0.3f;
+
+	UPROPERTY(EditAnywhere)
+	float JabDamage = 5.0f;
+
+	UPROPERTY(EditAnywhere)
+	float CrossDamage = 8.0f;
+
+	UPROPERTY(EditAnywhere)
+	float HookDamage = 12.0f;
+
+	UPROPERTY(EditAnywhere)
+	float UppercutDamage = 12.0f;
+
+	UPROPERTY(EditAnywhere)
+	float LowKickDamage = 5.0f;
+
+	UPROPERTY(EditAnywhere)
+	float MidKickDamage = 8.0f;
+
+	UPROPERTY(EditAnywhere)
+	float HighKickDamage = 12.0f;
+
+	UPROPERTY(EditAnywhere)
+	float BodyKickDamage = 10.0f;
+
 	void SetupEnhancedInput();
 
 	UPROPERTY()
