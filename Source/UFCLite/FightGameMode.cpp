@@ -53,13 +53,55 @@ void AFightGameMode::SpawnArenaFloor()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AStaticMeshActor* Floor = GetWorld()->SpawnActor<AStaticMeshActor>(FVector(0.0f, 0.0f, -60.0f), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
+
+	AStaticMeshActor* Floor = GetWorld()->SpawnActor<AStaticMeshActor>(FVector(0.f, 0.f, -60.f), FRotator::ZeroRotator, SpawnParams);
 	if (Floor)
 	{
 		Floor->SetMobility(EComponentMobility::Movable);
 		Floor->GetStaticMeshComponent()->SetStaticMesh(FloorMesh);
-		Floor->SetActorScale3D(FVector(500.0f, 50.0f, 0.5f));
+		Floor->SetActorScale3D(FVector(8.f, 8.f, 0.2f));
 		Floor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+
+	const float Radius = 400.f;
+	const float PostHeight = 300.f;
+	const float Deg22_5 = 22.5f * UE_PI / 180.f;
+	const TCHAR* OctMatPath = TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial");
+
+	for (int32 i = 0; i < 8; i++)
+	{
+		float Angle = Deg22_5 + i * UE_PI / 4.f;
+		FVector PostPos(Radius * FMath::Cos(Angle), Radius * FMath::Sin(Angle), PostHeight * 0.5f - 50.f);
+		AStaticMeshActor* Post = GetWorld()->SpawnActor<AStaticMeshActor>(PostPos, FRotator::ZeroRotator, SpawnParams);
+		if (Post)
+		{
+			Post->SetMobility(EComponentMobility::Movable);
+			Post->GetStaticMeshComponent()->SetStaticMesh(FloorMesh);
+			Post->SetActorScale3D(FVector(0.3f, 0.3f, PostHeight * 0.01f));
+			Post->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		}
+
+		float NextAngle = Deg22_5 + ((i + 1) % 8) * UE_PI / 4.f;
+		FVector NextPos(Radius * FMath::Cos(NextAngle), Radius * FMath::Sin(NextAngle), 0.f);
+		FVector Mid = (FVector(Radius * FMath::Cos(Angle), Radius * FMath::Sin(Angle), 0.f) + NextPos) * 0.5f;
+		float SegLen = FVector::Dist(PostPos, FVector(Radius * FMath::Cos(NextAngle), Radius * FMath::Sin(NextAngle), PostHeight * 0.5f - 50.f));
+		FVector SegDir = (NextPos - FVector(Radius * FMath::Cos(Angle), Radius * FMath::Sin(Angle), 0.f)).GetSafeNormal();
+
+		for (int32 r = 0; r < 3; r++)
+		{
+			float H = 40.f + r * 90.f;
+			FVector RailPos(Mid.X, Mid.Y, H);
+			AStaticMeshActor* Rail = GetWorld()->SpawnActor<AStaticMeshActor>(RailPos, FRotator::ZeroRotator, SpawnParams);
+			if (Rail)
+			{
+				Rail->SetMobility(EComponentMobility::Movable);
+				Rail->GetStaticMeshComponent()->SetStaticMesh(FloorMesh);
+				Rail->SetActorScale3D(FVector(SegLen * 0.01f, 0.15f, 0.15f));
+				float Yaw = FMath::Atan2(SegDir.Y, SegDir.X) * 180.f / UE_PI;
+				Rail->SetActorRotation(FRotator(0.f, Yaw, 0.f));
+				Rail->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			}
+		}
 	}
 }
 
