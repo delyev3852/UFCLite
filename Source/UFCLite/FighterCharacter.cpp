@@ -62,15 +62,16 @@ void AFighterCharacter::SetupEnhancedInput()
 	Map(MoveRightAction, EKeys::D);
 	Map(MoveRightAction, EKeys::Gamepad_LeftX);
 
-	Map(FaceLeftAction, EKeys::X);
+	Map(FaceLeftAction, EKeys::Z);
 	Map(FaceLeftAction, EKeys::Gamepad_FaceButton_Left);
-	Map(FaceTopAction, EKeys::Y);
+	Map(FaceTopAction, EKeys::X);
 	Map(FaceTopAction, EKeys::Gamepad_FaceButton_Top);
-	Map(FaceRightAction, EKeys::B);
+	Map(FaceRightAction, EKeys::C);
 	Map(FaceRightAction, EKeys::Gamepad_FaceButton_Right);
-	Map(FaceBottomAction, EKeys::A);
+	Map(FaceBottomAction, EKeys::V);
 	Map(FaceBottomAction, EKeys::Gamepad_FaceButton_Bottom);
 
+	Map(KickModifierAction, EKeys::Tab);
 	Map(KickModifierAction, EKeys::Gamepad_RightTrigger);
 	Map(BlockAction, EKeys::LeftShift);
 	Map(BlockAction, EKeys::Gamepad_RightShoulder);

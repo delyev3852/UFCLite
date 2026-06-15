@@ -40,7 +40,7 @@ void AFightGameMode::SpawnArenaFloor()
 	AStaticMeshActor* Floor = GetWorld()->SpawnActor<AStaticMeshActor>(FVector(0.0f, 0.0f, -60.0f), FRotator(0.0f, 0.0f, 0.0f), SpawnParams);
 	if (Floor)
 	{
-		Floor->SetMobility(EComponentMobility::Stationary);
+		Floor->SetMobility(EComponentMobility::Movable);
 		Floor->GetStaticMeshComponent()->SetStaticMesh(FloorMesh);
 		Floor->SetActorScale3D(FVector(500.0f, 50.0f, 0.5f));
 		Floor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
