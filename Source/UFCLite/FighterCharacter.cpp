@@ -1,3 +1,6 @@
+#include "Windows/AllowWindowsPlatformTypes.h"
+#include <Windows.h>
+#include "Windows/HideWindowsPlatformTypes.h"
 #include "FighterCharacter.h"
 #include "FightGameMode.h"
 #include "FighterAnimInstance.h"
