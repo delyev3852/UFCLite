@@ -22,10 +22,18 @@ AFighterCharacter::AFighterCharacter()
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MannequinMesh(TEXT("/Script/Engine.SkeletalMesh'/Engine/EngineMeshes/SkeletalMannequin.SkeletalMannequin'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MannequinMesh(TEXT("/Engine/EngineMeshes/SkeletalMannequin.SkeletalMannequin"));
 	if (MannequinMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(MannequinMesh.Object);
+	}
+	else
+	{
+		static ConstructorHelpers::FObjectFinder<USkeletalMesh> AltMannequin(TEXT("/Engine/EngineMeshes/SK_Mannequin.SK_Mannequin"));
+		if (AltMannequin.Succeeded())
+		{
+			GetMesh()->SetSkeletalMesh(AltMannequin.Object);
+		}
 	}
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->AnimClass = UFighterAnimInstance::StaticClass();
@@ -101,32 +109,9 @@ void AFighterCharacter::Tick(float DeltaTime)
 	if (GEngine && (GetWorld() && GetWorld()->TimeSeconds - LastDebugTime > 0.5f))
 	{
 		LastDebugTime = GetWorld()->TimeSeconds;
-		FString Msg = TEXT("GPad: ");
-		APlayerController* PC = Cast<APlayerController>(Controller);
-		if (PC)
-		{
-			static FKey Keys[] = {EKeys::Gamepad_FaceButton_Left, EKeys::Gamepad_FaceButton_Top, EKeys::Gamepad_FaceButton_Right, EKeys::Gamepad_FaceButton_Bottom, EKeys::Gamepad_LeftTrigger, EKeys::Gamepad_RightTrigger, EKeys::Gamepad_LeftShoulder, EKeys::Gamepad_RightShoulder};
-			for (auto& K : Keys)
-			{
-				if (PC->WasInputKeyJustPressed(K)) { Msg += K.ToString() + TEXT("!"); }
-			}
-			if (PC->PlayerInput)
-			{
-				Msg += TEXT(" |Stick:");
-				Msg += FString::SanitizeFloat(PC->PlayerInput->GetKeyValue(EKeys::Gamepad_LeftX));
-				Msg += TEXT(",");
-				Msg += FString::SanitizeFloat(PC->PlayerInput->GetKeyValue(EKeys::Gamepad_LeftY));
-			}
-		}
-
-		if (Msg.Len() > 12)
-		{
-			GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, Msg);
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Yellow, TEXT("No gamepad"));
-		}
+		bool bHasSkelMesh = GetMesh()->GetSkeletalMeshAsset() != nullptr;
+		FColor C = bHasSkelMesh ? FColor::Green : FColor::Red;
+		GEngine->AddOnScreenDebugMessage(1, 5.f, C, bHasSkelMesh ? TEXT("Mesh: LOADED") : TEXT("Mesh: MISSING"));
 	}
 }
 
