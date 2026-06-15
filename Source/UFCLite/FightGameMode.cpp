@@ -39,11 +39,7 @@ void AFightGameMode::BeginPlay()
 			GEngine->AddOnScreenDebugMessage(99, 10.f, bGamepad ? FColor::Green : FColor::Red,
 				FString::Printf(TEXT("Gamepad attached: %s"), bGamepad ? TEXT("YES") : TEXT("NO")));
 		}
-		if (!bGamepad)
-		{
-			GenApp->SetGamepadAttached(true);
-			GEngine->AddOnScreenDebugMessage(100, 10.f, FColor::Yellow, TEXT("Forced gamepad attach = true"));
-		}
+
 	}
 
 	SpawnFighters();
