@@ -25,6 +25,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndFight(AFighterCharacter* Winner);
 
+#if WITH_EDITOR
+	void ImportCharactersFromFbx();
+#endif
+
 	UFUNCTION(BlueprintPure)
 	AFighterCharacter* GetFighter1() const { return Fighter1; }
 

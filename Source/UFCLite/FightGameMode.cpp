@@ -12,6 +12,15 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Framework/Application/SlateApplication.h"
 
+#if WITH_EDITOR
+#include "AssetImportTask.h"
+#include "Factories/FbxFactory.h"
+#include "Factories/FbxImportUI.h"
+#include "AssetToolsModule.h"
+#include "IAssetTools.h"
+#include "HAL/FileManager.h"
+#endif
+
 AFightGameMode::AFightGameMode()
 {
 	DefaultPawnClass = nullptr;
@@ -28,6 +37,10 @@ AFightGameMode::AFightGameMode()
 void AFightGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if WITH_EDITOR
+	ImportCharactersFromFbx();
+#endif
 
 	SpawnArenaFloor();
 	SpawnArenaCamera();
@@ -217,3 +230,51 @@ void AFightGameMode::EndFight(AFighterCharacter* Loser)
 		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 	}, 5.0f, false);
 }
+
+#if WITH_EDITOR
+void AFightGameMode::ImportCharactersFromFbx()
+{
+	static bool bAlreadyDone = false;
+	if (bAlreadyDone) return;
+	bAlreadyDone = true;
+
+	FString FbxDir = FPaths::ProjectDir() / TEXT("fbx");
+	FString ContentPath = TEXT("/Game/Characters");
+
+	TArray<FString> Files;
+	IFileManager::Get().FindFiles(Files, *FbxDir, TEXT("fbx"));
+	if (Files.Num() == 0) return;
+
+	UFbxFactory* Factory = NewObject<UFbxFactory>();
+	Factory->ImportUI->MeshTypeToImport = FBXIT_SkeletalMesh;
+	Factory->ImportUI->bImportAnimations = true;
+	Factory->ImportUI->bCreatePhysicsAsset = true;
+	Factory->ImportUI->PhysicsAsset = nullptr;
+
+	FAssetToolsModule& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
+
+	for (const FString& File : Files)
+	{
+		FString FullPath = FbxDir / File;
+		FString AssetName = FPaths::GetBaseFilename(File);
+		FString DestPath = ContentPath / AssetName;
+
+		UAssetImportTask* Task = NewObject<UAssetImportTask>();
+		Task->Filename = FullPath;
+		Task->DestinationPath = ContentPath;
+		Task->DestinationName = AssetName;
+		Task->bReplaceExisting = false;
+		Task->bAutomated = true;
+		Task->bSave = false;
+		Task->Factory = Factory;
+
+		AssetTools.Get().ImportAssetTasks({Task});
+	}
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan,
+			FString::Printf(TEXT("Imported %d FBX files from fbx/"), Files.Num()));
+	}
+}
+#endif
