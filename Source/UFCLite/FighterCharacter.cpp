@@ -133,19 +133,19 @@ void AFighterCharacter::Tick(float DeltaTime)
 
 	if (PlayerIndex == 1)
 	{
+		bool bUp    = (GetAsyncKeyState(VK_UP)    & 0x8000) != 0;
+		bool bDown  = (GetAsyncKeyState(VK_DOWN)  & 0x8000) != 0;
+		bool bLeft  = (GetAsyncKeyState(VK_LEFT)  & 0x8000) != 0;
+		bool bRight = (GetAsyncKeyState(VK_RIGHT) & 0x8000) != 0;
+		if (bUp)    AddMovementInput(FVector(0.f, -1.f, 0.f), 1.f);
+		if (bDown)  AddMovementInput(FVector(0.f, -1.f, 0.f), -1.f);
+		if (bRight) AddMovementInput(FVector(1.f, 0.f, 0.f), 1.f);
+		if (bLeft)  AddMovementInput(FVector(1.f, 0.f, 0.f), -1.f);
+
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (PC)
 		{
-			bool bUp    = PC->IsInputKeyDown(EKeys::Up);
-			bool bDown  = PC->IsInputKeyDown(EKeys::Down);
-			bool bLeft  = PC->IsInputKeyDown(EKeys::Left);
-			bool bRight = PC->IsInputKeyDown(EKeys::Right);
-			if (bUp)    AddMovementInput(FVector(0.f, -1.f, 0.f), 1.f);
-			if (bDown)  AddMovementInput(FVector(0.f, -1.f, 0.f), -1.f);
-			if (bRight) AddMovementInput(FVector(1.f, 0.f, 0.f), 1.f);
-			if (bLeft)  AddMovementInput(FVector(1.f, 0.f, 0.f), -1.f);
-
-			bool bKick = PC->IsInputKeyDown(EKeys::L);
+			bool bKick = (GetAsyncKeyState('L') & 0x8000) != 0;
 			if (bKick)
 			{
 				if (PC->WasInputKeyJustPressed(EKeys::I)) RearKickLow();
@@ -161,14 +161,9 @@ void AFighterCharacter::Tick(float DeltaTime)
 				if (PC->WasInputKeyJustPressed(EKeys::K)) LeadUppercut();
 			}
 
-			if (PC->IsInputKeyDown(EKeys::RightControl))
-			{
-				if (!bIsBlocking) StartBlock();
-			}
-			else
-			{
-				if (bIsBlocking) StopBlock();
-			}
+			bool bBlock = (GetAsyncKeyState(VK_RCONTROL) & 0x8000) != 0;
+			if (bBlock && !bIsBlocking) StartBlock();
+			else if (!bBlock && bIsBlocking) StopBlock();
 		}
 	}
 
