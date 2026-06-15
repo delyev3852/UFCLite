@@ -19,6 +19,8 @@
 #include "AssetToolsModule.h"
 #include "IAssetTools.h"
 #include "HAL/FileManager.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "ObjectTools.h"
 #endif
 
 AFightGameMode::AFightGameMode()
@@ -234,12 +236,12 @@ void AFightGameMode::EndFight(AFighterCharacter* Loser)
 #if WITH_EDITOR
 void AFightGameMode::ImportCharactersFromFbx()
 {
-	static bool bAlreadyDone = false;
-	if (bAlreadyDone) return;
-	bAlreadyDone = true;
-
 	FString FbxDir = FPaths::ProjectDir() / TEXT("fbx");
 	FString ContentPath = TEXT("/Game/Characters");
+
+	TArray<FString> AlreadyImported;
+	IFileManager::Get().FindFiles(AlreadyImported, *(FPaths::ProjectContentDir() / TEXT("Characters")), TEXT("uasset"));
+	if (AlreadyImported.Num() > 0) return;
 
 	TArray<FString> Files;
 	IFileManager::Get().FindFiles(Files, *FbxDir, TEXT("fbx"));
@@ -249,6 +251,8 @@ void AFightGameMode::ImportCharactersFromFbx()
 	Factory->ImportUI->MeshTypeToImport = FBXIT_SkeletalMesh;
 	Factory->ImportUI->bImportAnimations = true;
 	Factory->ImportUI->bCreatePhysicsAsset = true;
+	Factory->ImportUI->bImportMaterials = false;
+	Factory->ImportUI->bImportTextures = false;
 	Factory->ImportUI->PhysicsAsset = nullptr;
 
 	FAssetToolsModule& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
@@ -263,7 +267,7 @@ void AFightGameMode::ImportCharactersFromFbx()
 		Task->Filename = FullPath;
 		Task->DestinationPath = ContentPath;
 		Task->DestinationName = AssetName;
-		Task->bReplaceExisting = false;
+		Task->bReplaceExisting = true;
 		Task->bAutomated = true;
 		Task->bSave = false;
 		Task->Factory = Factory;
