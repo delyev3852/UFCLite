@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Engine/StaticMeshActor.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Framework/Application/SlateApplication.h"
 
 AFightGameMode::AFightGameMode()
 {
@@ -28,6 +29,23 @@ void AFightGameMode::BeginPlay()
 
 	SpawnArenaFloor();
 	SpawnArenaCamera();
+
+	TSharedPtr<GenericApplication> GenApp = FSlateApplication::Get().GetPlatformApplication();
+	if (GenApp.IsValid())
+	{
+		bool bGamepad = GenApp->IsGamepadAttached();
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(99, 10.f, bGamepad ? FColor::Green : FColor::Red,
+				FString::Printf(TEXT("Gamepad attached: %s"), bGamepad ? TEXT("YES") : TEXT("NO")));
+		}
+		if (!bGamepad)
+		{
+			GenApp->SetGamepadAttached(true);
+			GEngine->AddOnScreenDebugMessage(100, 10.f, FColor::Yellow, TEXT("Forced gamepad attach = true"));
+		}
+	}
+
 	SpawnFighters();
 }
 
