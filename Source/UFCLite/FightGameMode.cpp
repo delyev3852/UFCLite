@@ -2,6 +2,7 @@
 #include "FighterCharacter.h"
 #include "FightHUD.h"
 #include "TimerManager.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
