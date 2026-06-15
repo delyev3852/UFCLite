@@ -30,6 +30,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	AFighterCharacter* GetFighter2() const { return Fighter2; }
 
+	bool bFightOver = false;
+	AFighterCharacter* Winner = nullptr;
+
 protected:
 	void SpawnArenaFloor();
 	void SpawnArenaCamera();
@@ -47,7 +50,4 @@ protected:
 
 	UPROPERTY()
 	ACameraActor* ArenaCamera;
-
-	bool bFightOver = false;
-	AFighterCharacter* Winner = nullptr;
 };

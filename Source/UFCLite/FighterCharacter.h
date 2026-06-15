@@ -106,7 +106,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float BodyKickDamage = 10.0f;
 
-	void SetupEnhancedInput(int32 InPlayerIndex = 0);
+	void SetupEnhancedInput();
 
 	UPROPERTY()
 	UInputMappingContext* InputMapping;
