@@ -134,16 +134,18 @@ void AFighterCharacter::Tick(float DeltaTime)
 	if (PlayerIndex == 1)
 	{
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
-		if (PC && PC->PlayerInput)
+		if (PC)
 		{
-			float Up    = PC->PlayerInput->GetKeyValue(EKeys::Up);
-			float Down  = PC->PlayerInput->GetKeyValue(EKeys::Down);
-			float Left  = PC->PlayerInput->GetKeyValue(EKeys::Left);
-			float Right = PC->PlayerInput->GetKeyValue(EKeys::Right);
-			AddMovementInput(FVector(0.f, -1.f, 0.f), Up - Down);
-			AddMovementInput(FVector(1.f, 0.f, 0.f), Right - Left);
+			bool bUp    = PC->IsInputKeyDown(EKeys::Up);
+			bool bDown  = PC->IsInputKeyDown(EKeys::Down);
+			bool bLeft  = PC->IsInputKeyDown(EKeys::Left);
+			bool bRight = PC->IsInputKeyDown(EKeys::Right);
+			if (bUp)    AddMovementInput(FVector(0.f, -1.f, 0.f), 1.f);
+			if (bDown)  AddMovementInput(FVector(0.f, -1.f, 0.f), -1.f);
+			if (bRight) AddMovementInput(FVector(1.f, 0.f, 0.f), 1.f);
+			if (bLeft)  AddMovementInput(FVector(1.f, 0.f, 0.f), -1.f);
 
-			bool bKick = PC->PlayerInput->GetKeyValue(EKeys::L) > 0.f;
+			bool bKick = PC->IsInputKeyDown(EKeys::L);
 			if (bKick)
 			{
 				if (PC->WasInputKeyJustPressed(EKeys::I)) RearKickLow();
@@ -159,7 +161,7 @@ void AFighterCharacter::Tick(float DeltaTime)
 				if (PC->WasInputKeyJustPressed(EKeys::K)) LeadUppercut();
 			}
 
-			if (PC->PlayerInput->GetKeyValue(EKeys::RightControl) > 0.f)
+			if (PC->IsInputKeyDown(EKeys::RightControl))
 			{
 				if (!bIsBlocking) StartBlock();
 			}
